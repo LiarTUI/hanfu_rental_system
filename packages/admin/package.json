@@ -1,0 +1,21 @@
+{
+  "name": "admin",
+  "private": true,
+  "scripts": {
+    "dev": "max dev --port 8002",
+    "build": "max build",
+    "postinstall": "max setup"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.0.1",
+    "@ant-design/pro-components": "^2.4.4",
+    "@umijs/max": "^4.7.22",
+    "antd": "^5.4.0",
+    "shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.33",
+    "@types/react-dom": "^18.0.11",
+    "typescript": "^5.0.3"
+  }
+}
