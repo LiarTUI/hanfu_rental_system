@@ -2,8 +2,8 @@
   "name": "web",
   "private": true,
   "scripts": {
-    "dev": "max dev",
     "build": "max build",
+    "dev": "max dev",
     "postinstall": "max setup"
   },
   "dependencies": {

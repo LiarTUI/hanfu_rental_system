@@ -2,8 +2,8 @@
   "name": "admin",
   "private": true,
   "scripts": {
-    "dev": "max dev --port 8002",
     "build": "max build",
+    "dev": "max dev --port 8002",
     "postinstall": "max setup"
   },
   "dependencies": {
