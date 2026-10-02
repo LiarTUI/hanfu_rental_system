@@ -10,7 +10,7 @@ export default defineConfig({
   routes: [
     {
       path: '/',
-      redirect: '/home',
+      component: '@/pages/Login',
     },
     {
       path: '/home',
@@ -22,5 +22,10 @@ export default defineConfig({
   alias: {
     shared: resolve(__dirname, '../shared/src'),
   },
+  proxy: {
+    '/api': {
+      target: 'http://10.105.4.127:8080',
+      changeOrigin: true,
+    },
+  },
 });
-

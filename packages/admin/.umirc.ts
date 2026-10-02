@@ -12,10 +12,6 @@ export default defineConfig({
   },
   routes: [
     {
-      path: '/',
-      redirect: '/dashboard',
-    },
-    {
       path: '/dashboard',
       component: '@/pages/Dashboard',
     },

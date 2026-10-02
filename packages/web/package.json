@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "max build",
-    "dev": "max dev",
+    "dev": "cross-env PORT=8000 max dev",
     "postinstall": "max setup"
   },
   "dependencies": {

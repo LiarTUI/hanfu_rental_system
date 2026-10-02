@@ -5,11 +5,14 @@
     "build": "pnpm -r build",
     "dev": "pnpm --filter web dev",
     "dev:admin": "pnpm --filter admin dev",
+    "dev:all": "pnpm -r --parallel dev",
     "dev:web": "pnpm --filter web dev",
     "format": "prettier --cache --write .",
     "prepare": "husky"
   },
   "devDependencies": {
+    "@types/node": "^26.6.4",
+    "cross-env": "^10.1.0",
     "husky": "^9",
     "lint-staged": "^13.2.0",
     "prettier": "^2.8.7",
