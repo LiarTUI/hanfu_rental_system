@@ -1,10 +1,106 @@
-import { useState } from 'react'
-function Home(){
+import IconFont from '@/components/IconFont';
+import { useNavigate } from '@@/exports';
+import { UserOutlined } from '@ant-design/icons';
+import type { TabsProps } from 'antd';
+import { Avatar, ConfigProvider, Layout, message, Tabs } from 'antd';
+import { useEffect, useState } from 'react';
+import { getProfile } from '../../services/user';
+import Home from './components/home';
+import KnowLedge from './components/knowLedge';
+import Mall from './components/mall';
+import SmartMatch from './components/smartMatch';
+import styles from './index.less';
+const tabs = [
+  { key: '1', label: '寻衣' },
+  { key: '2', label: '量体裁案' },
+  { key: '3', label: '风物志' },
+  { key: '4', label: '市集' },
+];
+function Index() {
+  const navigate = useNavigate();
+  const [activeKey, setActiveKey] = useState('1');
+  const [avatarAddress, setAvatarAddress] = useState();
+  useEffect(() => {
+    getUserData();
+  }, []);
+  const getUserData = async () => {
+    try {
+      const res = await getProfile();
+      if (res.success) setAvatarAddress(res.avatar);
+      else message.error('服务器异常');
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => {
     return (
-        <div>
-            aaa
-        </div>
+      <div className={styles.tab}>
+        <DefaultTabBar className={styles.tabItem} {...props} />
+      </div>
     );
+  };
+  const handleClick = (
+    e?: React.MouseEvent<HTMLElement | SVGSVGElement>,
+    key?: string,
+  ) => {
+    e?.stopPropagation();
+    navigate(`/${key}`, { replace: true });
+  };
+  return (
+    <ConfigProvider
+      theme={{
+        components: {
+          Tabs: {
+            itemHoverColor: 'rgb(148, 143, 131)',
+            itemColor: 'rgb(42, 40, 37)',
+            itemSelectedColor: 'rgb(178, 165, 144)',
+            inkBarColor: 'rgb(128, 125, 123)',
+          },
+        },
+      }}
+    >
+      <Layout className={styles.layout}>
+        <Layout.Header className={styles.header}>
+          <div className={styles.logoTitle}>
+            <span
+              className={styles.spantitle}
+              style={{ color: 'rgb(142, 53, 46)' }}
+            >
+              /
+            </span>
+            <span className={styles.spantitle}>华衿</span>
+            <span style={{ fontSize: '12px' }}>HUA JIN</span>
+          </div>
+          <Tabs
+            activeKey={activeKey}
+            onChange={setActiveKey}
+            renderTabBar={renderTabBar}
+            items={tabs}
+            centered
+            tabBarGutter={60}
+          />
+          <IconFont
+            onClick={(e) => handleClick(e, 'cart')}
+            className={styles.icon}
+            type="icon-gouwuche"
+            size={26}
+          ></IconFont>
+          <Avatar
+            onClick={(e) => handleClick(e, 'personalCenter')}
+            className={styles.avatar}
+            src={avatarAddress}
+            icon={avatarAddress ? '' : <UserOutlined />}
+          ></Avatar>
+        </Layout.Header>
+        <Layout.Content className={styles.content}>
+          {activeKey === '1' && <Home />}
+          {activeKey === '2' && <SmartMatch />}
+          {activeKey === '3' && <KnowLedge />}
+          {activeKey === '4' && <Mall />}
+        </Layout.Content>
+      </Layout>
+    </ConfigProvider>
+  );
 }
 
-export default Home
+export default Index;

@@ -6,7 +6,7 @@ export async function login(
   type: string,
 ) {
   const address = `/api/${type}/login`;
-  return request<{ success: boolean; errorMsg?: string }>(address, {
+  return request<any>(address, {
     method: 'POST',
     data: params,
   });
@@ -25,4 +25,9 @@ export async function register(params: {
       data: params,
     },
   );
+}
+
+//根据用户token获取用户信息
+export async function getProfile() {
+  return request<any>('/api/user/profile');
 }

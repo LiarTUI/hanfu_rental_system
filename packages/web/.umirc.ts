@@ -7,6 +7,7 @@ export default defineConfig({
   model: {},
   initialState: {},
   request: {},
+  headScripts: ['https://at.alicdn.com/t/c/font_5240047_g8j0dkdpyct.js'],
   routes: [
     {
       path: '/',
@@ -15,6 +16,10 @@ export default defineConfig({
     {
       path: '/home',
       component: '@/pages/Home',
+    },
+    {
+      path: '/personalCenter',
+      component: '@/pages/PersonalCenter',
     },
   ],
   npmClient: 'pnpm',

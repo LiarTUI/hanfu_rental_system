@@ -18,12 +18,14 @@ function LoginForm({ role }: LoginFormProps) {
     try {
       const res = await login(values, role);
       if (res.success) {
+        localStorage.setItem('token', res.data.token);
         message.success('登录成功！');
         if (role === 'admin') {
           window.location.href = ADMIN_HOME;
         } else {
           navigate('/home', { replace: true });
         }
+        return;
       }
       message.error(res.errorMsg);
     } catch (e) {

@@ -1,0 +1,72 @@
+.container {
+  font-family: 'Noto Serif SC';
+  display: flex;
+  background-image: linear-gradient(rgb(248, 247, 242), rgb(244, 244, 210));
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+
+  .contentBox {
+    width: 1400px;
+    height: 600px;
+    background-color: transparent;
+    transform: translateY(-20%);
+    border-radius: 20px;
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      padding: 30px;
+
+      .button {
+        color: rgb(248, 247, 242);
+        background-color: rgb(42, 40, 37);
+        border-radius: 10px;
+        font-size: 14px;
+        width: 200px;
+        height: 40px;
+        margin-top: 16px;
+        height: 52px;
+        width: 217.208px;
+        font-weight: 400;
+        letter-spacing: 4.2px;
+
+        .icon {
+          transition: all 0.3s;
+        }
+
+        &:hover .icon {
+          transform: translate(5px);
+        }
+
+        &:hover {
+          box-shadow: 0 0 12px rgba(152, 152, 242, 0.45);
+          border-color: rgb(152, 152, 242) !important;
+        }
+      }
+
+      span:not(:first-of-type) {
+        color: rgb(107, 104, 99);
+        font-size: 18px;
+        margin-bottom: 14px;
+        letter-spacing: 1.8px;
+      }
+
+      > span:nth-child(3) {
+        font-family: BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+        font-size: 14px;
+      }
+
+      > span:nth-child(1) {
+        max-width: 370px;
+        color: rgb(42, 40, 37);
+        font-size: 48px;
+        font-weight: 900;
+        margin-bottom: 20px;
+        letter-spacing: 4.8px;
+      }
+    }
+  }
+}
