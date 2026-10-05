@@ -1,0 +1,255 @@
+.mall {
+  min-height: calc(100vh - 64px);
+  padding: 56px 64px 80px;
+  background-color: rgb(248, 247, 242);
+  font-family: 'Noto Serif SC';
+
+  * {
+    box-sizing: border-box;
+  }
+
+  // ========== 页头：标题 + 档期筛选 ==========
+  .pageHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    .pageTitle {
+      margin: 0;
+      font-size: 40px;
+      font-weight: 900;
+      letter-spacing: 6px;
+      color: rgb(42, 40, 37);
+    }
+
+    .pageEyebrow {
+      margin: 8px 0 0 2px;
+      font-size: 12px;
+      letter-spacing: 4px;
+      color: #9a978f;
+    }
+
+    .dateCard {
+      position: relative;
+      padding: 14px 22px;
+      border: 1px solid rgb(42, 40, 37);
+      background-color: #fff;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+
+      &:hover {
+        box-shadow: 3px 3px 0 rgba(42, 40, 37, 0.15);
+      }
+
+      .dateTip {
+        margin: 0 0 6px;
+        font-size: 12px;
+        letter-spacing: 1px;
+        color: #9a978f;
+      }
+
+      .dateMain {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: rgb(42, 40, 37);
+      }
+
+      // 隐形 RangePicker：铺满卡片负责弹日历，视觉完全由卡片自己呈现
+      .pickerHidden {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+  }
+
+  // ========== 筛选栏：断代 / 形制 / 排序 ==========
+  .filterBar {
+    display: flex;
+    align-items: center;
+    margin-top: 40px;
+    border-bottom: 1px solid rgba(42, 40, 37, 0.12);
+
+    .dynastyTabs {
+      display: flex;
+      gap: 36px;
+    }
+
+    .dynastyTab {
+      padding-bottom: 12px;
+      border-bottom: 2px solid transparent;
+      font-size: 15px;
+      letter-spacing: 2px;
+      color: #9a978f;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+
+      &:hover {
+        color: rgb(42, 40, 37);
+      }
+    }
+
+    .tabActive {
+      color: rgb(42, 40, 37);
+      font-weight: 700;
+      border-bottom-color: rgb(42, 40, 37);
+    }
+
+    .styleSelect {
+      min-width: 150px;
+      margin-left: 40px;
+      padding-left: 32px;
+      border-left: 1px solid rgba(42, 40, 37, 0.12);
+    }
+
+    .sortSelect {
+      min-width: 170px;
+      margin-left: auto;
+    }
+
+    // 让两个下拉的文字跟随页面衬线字体
+    .styleSelect,
+    .sortSelect {
+      :global(.ant-select-selector) {
+        font-family: 'Noto Serif SC';
+      }
+    }
+  }
+
+  // ========== 商品网格 ==========
+  .goodsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 48px 28px;
+    margin-top: 44px;
+  }
+
+  .goodsCard {
+    cursor: pointer;
+
+    .goodsImgBox {
+      position: relative;
+      height: 340px;
+      overflow: hidden;
+      background-color: #e9e7e1;
+      border: 1px solid rgba(42, 40, 37, 0.06);
+
+      .goodsImg {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .featuredBadge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 4px 10px;
+        background-color: rgb(142, 53, 46);
+        font-size: 12px;
+        letter-spacing: 2px;
+        color: #fff;
+      }
+
+      .soldOutTag {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 8px 16px;
+        border: 1px solid rgba(42, 40, 37, 0.4);
+        background-color: rgba(255, 255, 255, 0.85);
+        font-size: 12px;
+        letter-spacing: 2px;
+        color: rgb(107, 104, 99);
+        white-space: nowrap;
+      }
+    }
+
+    .goodsRow {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-top: 16px;
+    }
+
+    .goodsName {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: rgb(42, 40, 37);
+    }
+
+    .priceBox {
+      flex-shrink: 0;
+      margin-left: 12px;
+      text-align: right;
+
+      .price {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 900;
+        color: rgb(42, 40, 37);
+
+        span {
+          margin-right: 2px;
+          font-size: 12px;
+          font-weight: 700;
+        }
+      }
+
+      .per {
+        font-size: 12px;
+        color: #9a978f;
+      }
+    }
+
+    .goodsMeta {
+      margin: 8px 0 0;
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: #9a978f;
+    }
+
+    &:hover .goodsImgBox {
+      box-shadow: 0 6px 18px rgba(42, 40, 37, 0.12);
+    }
+  }
+
+  // 约满卡：图片与文字整体灰化，仅保留居中标签清晰可读
+  .cardSoldOut {
+    cursor: default;
+
+    .goodsImgBox .goodsImg,
+    .goodsImgBox .goodsImgPlaceholder {
+      opacity: 0.5;
+    }
+
+    .goodsName,
+    .price,
+    .price span,
+    .goodsMeta {
+      color: #b3b0a8;
+    }
+
+    &:hover .goodsImgBox {
+      box-shadow: none;
+    }
+  }
+
+  .emptyBlock {
+    margin-top: 100px;
+    text-align: center;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #9a978f;
+  }
+}

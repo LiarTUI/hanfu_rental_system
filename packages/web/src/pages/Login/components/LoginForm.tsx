@@ -1,6 +1,6 @@
 import { useNavigate } from '@umijs/max';
 import { Button, Form, Input, message } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ADMIN_HOME } from 'shared';
 import { login } from '../../../services/user';
 import type { formData } from '../type';
@@ -35,6 +35,11 @@ function LoginForm({ role }: LoginFormProps) {
     }
   };
 
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      navigate('/home', { replace: true });
+    }
+  }, [navigate]);
   return (
     <Form onFinish={onFinish} name={`login-${role}`}>
       <Form.Item

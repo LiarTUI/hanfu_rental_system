@@ -1,16 +1,20 @@
 .container {
   font-family: 'Noto Serif SC';
-  display: flex;
   background-image: linear-gradient(rgb(248, 247, 242), rgb(244, 244, 210));
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+
+  // hero 层：高度 = 一屏 - 顶栏64 - 底部要露出场景标题的180
+  .hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 64px - 180px);
+    min-height: 700px; // 保底高度，防止矮屏幕下 contentBox 放不下
+  }
 
   .contentBox {
     width: 1400px;
     height: 600px;
     background-color: transparent;
-    transform: translateY(-20%);
     border-radius: 20px;
 
     .content {
@@ -68,5 +72,329 @@
         letter-spacing: 4.8px;
       }
     }
+  }
+
+  // ========== 场景提案板块 ==========
+  .sceneSection {
+    width: 1300px;
+    margin: 0 auto;
+    padding: 40px 0 80px;
+
+    .sceneHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(42, 40, 37, 0.15);
+
+      .sceneTitle {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        color: rgb(42, 40, 37);
+      }
+
+      .sceneSubTitle {
+        margin: 6px 0 0;
+        font-size: 12px;
+        letter-spacing: 3px;
+        color: #999;
+      }
+
+      .sceneMore {
+        font-size: 14px;
+        color: rgb(42, 40, 37);
+        cursor: pointer;
+      }
+    }
+
+    .sceneList {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 32px;
+
+      .sceneCard {
+        width: 404px;
+
+        .sceneImgBox {
+          position: relative;
+          width: 100%;
+          height: 430px;
+
+          .sceneImgPlaceholder {
+            width: 100%;
+            height: 100%;
+            background-color: #e8e6e0;
+          }
+
+          .sceneImg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .sceneTag {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            writing-mode: vertical-rl;
+            padding: 12px 6px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgb(42, 40, 37);
+            font-size: 13px;
+            letter-spacing: 4px;
+            color: rgb(42, 40, 37);
+          }
+
+          .tagRed {
+            color: #b3352c;
+            border-color: #b3352c;
+          }
+        }
+
+        .sceneName {
+          margin: 20px 0 8px;
+          font-size: 20px;
+          font-weight: 700;
+          color: rgb(42, 40, 37);
+        }
+
+        .sceneDesc {
+          margin: 0 0 16px;
+          font-size: 13px;
+          color: #8a877f;
+        }
+
+        .sceneLink {
+          display: inline-block;
+          padding-bottom: 2px;
+          border-bottom: 1px solid rgb(42, 40, 37);
+          font-size: 13px;
+          color: rgb(42, 40, 37);
+          cursor: pointer;
+
+          &:hover {
+            color: #b3352c;
+            border-bottom-color: #b3352c;
+          }
+        }
+      }
+    }
+  }
+
+  // ========== 本周风物 / 关联良选单品板块 ==========
+  .knowledgeSection {
+    display: flex;
+    width: 1300px;
+    margin: 0 auto;
+    padding: 100px 0 80px;
+    border-top: 1px solid rgba(42, 40, 37, 0.15); // 与场景板块之间的分隔线
+
+    .knowledgeLeft {
+      width: 46%;
+      padding-right: 48px;
+      border-right: 1px solid rgba(42, 40, 37, 0.12); // 左右分栏的竖分隔线
+
+      .knowledgeTag {
+        margin: 0 0 16px;
+        font-size: 12px;
+        letter-spacing: 2px;
+        color: #b3352c;
+      }
+
+      .knowledgeTitle {
+        margin: 0 0 20px;
+        font-size: 34px;
+        font-weight: 900;
+        line-height: 1.4;
+        letter-spacing: 2px;
+        color: rgb(42, 40, 37);
+      }
+
+      .knowledgeDesc {
+        margin: 0 0 28px;
+        font-size: 14px;
+        line-height: 2;
+        letter-spacing: 1px;
+        color: rgb(107, 104, 99);
+      }
+
+      .knowledgeBtn {
+        display: inline-block;
+        padding: 10px 24px;
+        border: 1px solid rgb(42, 40, 37);
+        font-size: 13px;
+        letter-spacing: 2px;
+        color: rgb(42, 40, 37);
+        cursor: pointer;
+
+        &:hover {
+          background-color: rgb(42, 40, 37);
+          color: rgb(248, 247, 242);
+        }
+      }
+    }
+
+    .knowledgeRight {
+      flex: 1;
+      padding-left: 48px;
+
+      .relatedTitle {
+        margin: 0 0 20px;
+        font-size: 15px;
+        font-weight: 700;
+        color: rgb(42, 40, 37);
+
+        span {
+          margin-left: 8px;
+          font-size: 12px;
+          font-weight: 400;
+          color: #999;
+        }
+      }
+
+      .relatedList {
+        display: flex;
+        gap: 40px;
+
+        .relatedCard {
+          width: 300px;
+
+          .relatedImgBox {
+            position: relative;
+            width: 100%;
+            height: 220px;
+
+            .relatedImgPlaceholder {
+              width: 100%;
+              height: 100%;
+              background-color: #e8e6e0;
+            }
+
+            .relatedImg {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+          }
+
+          .relatedName {
+            margin: 14px 0 6px;
+            font-size: 15px;
+            font-weight: 700;
+            color: rgb(42, 40, 37);
+          }
+
+          .relatedPrice {
+            margin: 0;
+            font-size: 13px;
+            color: #8a877f;
+          }
+        }
+      }
+    }
+  }
+
+  // ========== 档期良选板块 ==========
+  .marketSection {
+    width: 1300px;
+    margin: 0 auto;
+    padding: 80px 0 60px;
+
+    .marketHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(42, 40, 37, 0.15);
+
+      .marketTitle {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        color: rgb(42, 40, 37);
+      }
+
+      .marketSubTitle {
+        margin: 6px 0 0;
+        font-size: 12px;
+        letter-spacing: 3px;
+        color: #999;
+      }
+
+      .marketMore {
+        font-size: 14px;
+        color: rgb(42, 40, 37);
+        cursor: pointer;
+      }
+    }
+
+    .marketList {
+      display: flex;
+      gap: 24px;
+      margin-top: 32px;
+
+      .marketCard {
+        flex: 1;
+
+        .marketImgBox {
+          width: 100%;
+          height: 240px;
+          border: 1px solid rgba(42, 40, 37, 0.1);
+
+          .marketImgPlaceholder {
+            width: 100%;
+            height: 100%;
+            background-color: #e8e6e0;
+          }
+
+          .marketImg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+
+        .marketRow {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          margin: 16px 0 6px;
+
+          .marketName {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: rgb(42, 40, 37);
+          }
+
+          .marketPrice {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: rgb(42, 40, 37);
+          }
+        }
+
+        .marketCategory {
+          margin: 0;
+          font-size: 12px;
+          color: #8a877f;
+        }
+      }
+    }
+  }
+
+  // ========== 页脚 ==========
+  .footer {
+    margin-top: 40px;
+    padding: 24px 0;
+    border-top: 1px solid rgba(42, 40, 37, 0.1);
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: #a5a29a;
   }
 }

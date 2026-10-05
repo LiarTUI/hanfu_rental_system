@@ -1,0 +1,402 @@
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes diamondSpin {
+  from {
+    transform: rotate(45deg);
+  }
+  to {
+    transform: rotate(405deg);
+  }
+}
+
+.smartMatch {
+  position: relative;
+  min-height: calc(100vh - 64px);
+  background-color: rgb(248, 247, 242);
+  font-family: 'Noto Serif SC';
+  padding: 60px 0 80px;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  // ========== 左侧步骤指示轨 ==========
+  .stepRail {
+    position: absolute;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+
+    // 贯穿圆点的竖线
+    &::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      width: 1px;
+      background-color: rgba(42, 40, 37, 0.15);
+    }
+
+    .railDot {
+      position: relative;
+      z-index: 1;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #d8d5cd;
+      transition: background-color 0.3s;
+    }
+
+    .railDotActive {
+      background-color: rgb(142, 53, 46);
+    }
+  }
+
+  // ========== 每一步的公共块 ==========
+  .stepBlock {
+    width: 1300px;
+    margin: 0 auto;
+    animation: fadeUp 0.45s ease both;
+
+    .stepEyebrow {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: rgb(142, 53, 46);
+
+      .eyebrowTag {
+        font-weight: 400;
+      }
+    }
+
+    .stepTitle {
+      margin: 14px 0 44px;
+      font-size: 40px;
+      font-weight: 900;
+      line-height: 1.5;
+      letter-spacing: 4px;
+      color: rgb(42, 40, 37);
+    }
+  }
+
+  // ========== 步骤 1：场景卡片 ==========
+  .sceneList {
+    display: flex;
+    gap: 22px;
+
+    .sceneCard {
+      position: relative;
+      width: 205px;
+      height: 340px;
+      overflow: hidden;
+      cursor: pointer;
+      background: linear-gradient(180deg, #f3f2ee, #b9b6ae);
+      border: 1px solid transparent;
+      transition: border-color 0.2s, transform 0.2s;
+
+      &:hover {
+        transform: translateY(-4px);
+      }
+
+      .sceneImg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .sceneMask {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(0, 0, 0, 0.05) 40%,
+          rgba(0, 0, 0, 0.65)
+        );
+      }
+
+      .sceneNameLight {
+        position: absolute;
+        left: 18px;
+        bottom: 16px;
+        z-index: 1;
+        color: rgb(248, 247, 242);
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: 3px;
+      }
+
+      .sceneCenter {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+
+        .sceneIconCircle {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          border: 1px solid rgba(42, 40, 37, 0.35);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .sceneNameDark {
+          color: rgb(42, 40, 37);
+          font-size: 16px;
+          font-weight: 700;
+          letter-spacing: 3px;
+        }
+      }
+    }
+  }
+
+  // ========== 步骤 2：气韵卡片（2x2）==========
+  .styleGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+
+    .styleCard {
+      position: relative;
+      overflow: hidden;
+      min-height: 150px;
+      padding: 28px 28px 24px;
+      cursor: pointer;
+      border: 1px solid rgba(42, 40, 37, 0.14);
+      transition: border-color 0.2s;
+
+      &:hover {
+        border-color: rgba(42, 40, 37, 0.4);
+      }
+
+      .watermark {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 64px;
+        font-weight: 900;
+        color: rgba(42, 40, 37, 0.07);
+        pointer-events: none;
+      }
+
+      .styleName {
+        margin: 0 0 12px;
+        font-size: 20px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        color: rgb(42, 40, 37);
+      }
+
+      .styleDesc {
+        margin: 0;
+        max-width: 300px;
+        font-size: 13px;
+        line-height: 1.8;
+        color: rgb(130, 127, 120);
+      }
+    }
+  }
+
+  // 选中态（两种卡片通用）
+  .cardSelected {
+    border-color: rgb(142, 53, 46);
+  }
+
+  // ========== 步骤 3：档期卡片 ==========
+  .dateCard {
+    width: 560px;
+    padding: 32px 40px 40px;
+    background-color: #fff;
+    border: 1px solid rgba(42, 40, 37, 0.08);
+    box-shadow: 0 2px 8px rgba(42, 40, 37, 0.06);
+
+    .dateTip {
+      margin: 0 0 16px;
+      font-size: 13px;
+      color: rgb(130, 127, 120);
+    }
+
+    .dateBox {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      padding: 14px 56px 14px 20px;
+      border: 1px solid rgb(42, 40, 37);
+      background-color: #fff;
+      cursor: pointer;
+
+      .dateItem {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .dateLabel {
+          font-size: 11px;
+          letter-spacing: 1px;
+          color: #999;
+        }
+
+        .dateValue {
+          font-size: 18px;
+          font-weight: 700;
+          color: rgb(42, 40, 37);
+        }
+      }
+
+      .dateDivider {
+        width: 1px;
+        margin: 0 20px;
+        background-color: rgba(42, 40, 37, 0.2);
+      }
+
+      .dateIcon {
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: rgb(42, 40, 37);
+      }
+
+      // 隐形的 RangePicker：覆盖在自绘盒子上，负责弹出日历
+      .datePickerHidden {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+
+    .inferBtn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      height: 56px;
+      margin-top: 28px;
+      border: none;
+      background-color: rgb(42, 40, 37);
+      color: rgb(248, 247, 242);
+      font-family: inherit;
+      font-size: 15px;
+      letter-spacing: 8px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.88;
+      }
+    }
+  }
+
+  // ========== 步骤 4：推演中 ==========
+  .loadingBlock {
+    min-height: calc(100vh - 64px - 140px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+
+    .loadingCircle {
+      width: 120px;
+      height: 120px;
+      border: 1px dashed #c9c6be;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loadingDiamond {
+      width: 46px;
+      height: 46px;
+      border: 2px solid rgb(142, 53, 46);
+      animation: diamondSpin 2s linear infinite;
+    }
+
+    .loadingText {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      color: rgb(42, 40, 37);
+    }
+  }
+
+  // ========== 步骤 5：结果占位 ==========
+  .resultCard {
+    width: 560px;
+    padding: 28px 32px;
+    background-color: #fff;
+    border: 1px solid rgba(42, 40, 37, 0.15);
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 2.4;
+      color: rgb(130, 127, 120);
+
+      b {
+        color: rgb(42, 40, 37);
+        margin-left: 4px;
+      }
+    }
+
+    .resultBtns {
+      display: flex;
+      gap: 16px;
+      margin-top: 24px;
+
+      button {
+        flex: 1;
+        height: 46px;
+        font-family: inherit;
+        font-size: 14px;
+        letter-spacing: 4px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+
+        &:hover {
+          opacity: 0.85;
+        }
+      }
+
+      .restartBtn {
+        background-color: transparent;
+        border: 1px solid rgb(42, 40, 37);
+        color: rgb(42, 40, 37);
+      }
+
+      .goRentBtn {
+        background-color: rgb(42, 40, 37);
+        border: 1px solid rgb(42, 40, 37);
+        color: rgb(248, 247, 242);
+      }
+    }
+  }
+}

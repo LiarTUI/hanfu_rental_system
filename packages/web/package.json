@@ -11,6 +11,7 @@
     "@ant-design/pro-components": "^2.4.4",
     "@umijs/max": "^4.7.22",
     "antd": "^5.4.0",
+    "dayjs": "^1.11.23",
     "shared": "workspace:*"
   },
   "devDependencies": {

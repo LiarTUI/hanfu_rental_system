@@ -93,10 +93,10 @@ function Index() {
           ></Avatar>
         </Layout.Header>
         <Layout.Content className={styles.content}>
-          {activeKey === '1' && <Home />}
-          {activeKey === '2' && <SmartMatch />}
-          {activeKey === '3' && <KnowLedge />}
-          {activeKey === '4' && <Mall />}
+          {activeKey === '1' && <Home setActiveKey={setActiveKey} />}
+          {activeKey === '2' && <SmartMatch setActiveKey={setActiveKey} />}
+          {activeKey === '3' && <KnowLedge setActiveKey={setActiveKey} />}
+          {activeKey === '4' && <Mall setActiveKey={setActiveKey} />}
         </Layout.Content>
       </Layout>
     </ConfigProvider>
