@@ -7,3 +7,7 @@ export const ADMIN_HOME =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:8002/dashboard'
     : '/admin/';
+
+/** 用户端登录页地址：Login 页挂在根路由，开发环境跳 8000 端口 */
+export const WEB_LOGIN =
+  process.env.NODE_ENV === 'development' ? 'http://localhost:8000/' : '/';

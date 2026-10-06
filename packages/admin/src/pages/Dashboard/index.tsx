@@ -1,10 +1,17 @@
 import { PageContainer } from '@ant-design/pro-components';
-import { APP_NAME } from 'shared';
 
 function Dashboard() {
   return (
     <PageContainer>
-      <div>{APP_NAME} 后台管理系统</div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <h1 style={{ color: 'red' }}>听过没有</h1>
+      </div>
     </PageContainer>
   );
 }
