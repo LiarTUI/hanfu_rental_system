@@ -26,7 +26,8 @@ function Index() {
   const getUserData = async () => {
     try {
       const res = await getProfile();
-      if (res.success) setAvatarAddress(res.avatar);
+      // 用户信息嵌在后端响应的 data 字段里
+      if (res.success) setAvatarAddress(res.data?.avatar);
       else message.error('服务器异常');
     } catch (e) {
       console.log(e);

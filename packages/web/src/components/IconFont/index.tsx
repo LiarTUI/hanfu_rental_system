@@ -6,6 +6,7 @@ interface IconFontProps {
   className?: string;
   style?: CSSProperties;
   onClick?: MouseEventHandler<SVGSVGElement>;
+  click?: boolean;
 }
 
 export default function IconFont({
@@ -15,6 +16,7 @@ export default function IconFont({
   className,
   style,
   onClick,
+  click,
 }: IconFontProps) {
   return (
     <svg
@@ -25,6 +27,7 @@ export default function IconFont({
         height: size,
         color,
         verticalAlign: 'middle',
+        cursor: click ? 'pointer' : '',
         ...style,
       }}
       onClick={onClick}

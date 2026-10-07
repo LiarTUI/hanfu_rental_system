@@ -1,12 +1,17 @@
 // 运行时配置
+import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import type { RunTimeLayoutConfig } from '@umijs/max';
+import { Dropdown } from 'antd';
 import { WEB_LOGIN } from 'shared';
 import { getSysMenu } from './services/sys_menu';
 
-// 全局初始化数据配置，用于 Layout 用户信息和权限初始化
-export async function getInitialState(): Promise<{
+interface AdminInitialState {
   name: string;
   menuPaths: string[];
-}> {
+}
+
+// 全局初始化数据配置，用于 Layout 用户信息和权限初始化
+export async function getInitialState(): Promise<AdminInitialState> {
   // 接收用户端登录页跨端口交接来的 token：存进 8002 自己的存储，随后把地址栏清理干净
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
@@ -67,3 +72,29 @@ export const request = {
     },
   ],
 };
+
+// 运行时 Layout 配置：头像区（icon + name）在此定制，加交互用 Dropdown 包一层
+export const layout: RunTimeLayoutConfig = ({ initialState }) => ({
+  avatarProps: {
+    icon: <UserOutlined />,
+    title: initialState?.name ?? 'Admin',
+    size: 'small',
+    render: (_props, dom) => (
+      <Dropdown
+        menu={{
+          items: [
+            { key: 'logout', icon: <LogoutOutlined />, label: '退出登录' },
+          ],
+          onClick: ({ key }) => {
+            if (key === 'logout') {
+              localStorage.removeItem('token');
+              window.location.href = WEB_LOGIN;
+            }
+          },
+        }}
+      >
+        {dom}
+      </Dropdown>
+    ),
+  },
+});

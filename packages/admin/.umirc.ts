@@ -5,6 +5,7 @@ export default defineConfig({
   antd: {},
   model: {},
   initialState: {},
+  access: {},
   request: {},
   layout: {
     title: '华衿后台',
@@ -56,14 +57,28 @@ export default defineConfig({
     {
       path: '/store',
       name: '店铺管理',
-      routes: [{ path: '/store/list', component: '@/pages/store/list' }],
+      routes: [
+        {
+          path: '/store/list',
+          component: '@/pages/store/list',
+          name: '店铺列表',
+        },
+      ],
     },
     {
       path: '/member',
-      name: '会员管理',
+      name: '用户管理',
       routes: [
-        { path: '/member/list', component: '@/pages/member/list' },
-        { path: '/member/review', component: '@/pages/member/review' },
+        {
+          path: '/member/list',
+          component: '@/pages/member/list',
+          name: '用户列表',
+        },
+        {
+          path: '/member/review',
+          component: '@/pages/member/review',
+          name: '用户评价',
+        },
       ],
     },
     {
@@ -101,7 +116,7 @@ export default defineConfig({
   },
   proxy: {
     '/api': {
-      target: 'http://10.105.4.127:8080',
+      target: 'http://localhost:8080',
       changeOrigin: true,
     },
   },

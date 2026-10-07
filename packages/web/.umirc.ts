@@ -7,7 +7,7 @@ export default defineConfig({
   model: {},
   initialState: {},
   request: {},
-  headScripts: ['https://at.alicdn.com/t/c/font_5240047_g8j0dkdpyct.js'],
+  headScripts: ['https://at.alicdn.com/t/c/font_5240047_8oal9bcdk3o.js'],
   routes: [
     {
       path: '/',
@@ -29,7 +29,7 @@ export default defineConfig({
   },
   proxy: {
     '/api': {
-      target: 'http://10.105.4.127:8080',
+      target: 'http://localhost:8080',
       changeOrigin: true,
     },
   },
