@@ -1,6 +1,6 @@
 import { defineConfig } from '@umijs/max';
 import { resolve } from 'path';
-
+import { address } from 'shared';
 export default defineConfig({
   antd: {},
   access: {},
@@ -29,7 +29,7 @@ export default defineConfig({
   },
   proxy: {
     '/api': {
-      target: 'http://localhost:8080',
+      target: address,
       changeOrigin: true,
     },
   },
