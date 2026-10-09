@@ -2,7 +2,11 @@
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { Dropdown } from 'antd';
-import { WEB_LOGIN } from 'shared';
+import {
+  WEB_LOGIN,
+  createAuthResponseInterceptors,
+  tokenRequestInterceptor,
+} from 'shared';
 import { getSysMenu } from './services/sys_menu';
 
 interface AdminInitialState {
@@ -40,37 +44,9 @@ export async function getInitialState(): Promise<AdminInitialState> {
 }
 
 export const request = {
-  requestInterceptors: [
-    (url: string, options: any) => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        options.headers = {
-          ...options.headers,
-          Authorization: `Bearer ${token}`,
-        };
-      }
-      return { url, options };
-    },
-  ],
-  responseInterceptors: [
-    (response: any) => {
-      const { status, config, data } = response;
-      const url = typeof config?.url === 'string' ? config.url : '';
-      const msg: string = data?.errorMsg ?? '';
-      // 鉴权类失败才登出：401、token 对应用户已不存在、token 失效
-      const tokenInvalid =
-        status === 401 ||
-        msg.includes('用户不存在') ||
-        msg.includes('token失效');
-      // 登录接口的"用户不存在"是账号输错，不当作登录态失效
-      const isLoginApi = url.includes('/login');
-      if (tokenInvalid && !isLoginApi && localStorage.getItem('token')) {
-        localStorage.removeItem('token');
-        window.location.href = WEB_LOGIN;
-      }
-      return response;
-    },
-  ],
+  requestInterceptors: [tokenRequestInterceptor],
+  // 失效登出：admin 自己没有登录页，统一踢回用户端登录页
+  responseInterceptors: [createAuthResponseInterceptors(WEB_LOGIN)],
 };
 
 // 运行时 Layout 配置：头像区（icon + name）在此定制，加交互用 Dropdown 包一层
