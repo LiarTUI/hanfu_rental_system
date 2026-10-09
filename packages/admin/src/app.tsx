@@ -14,12 +14,17 @@ interface AdminInitialState {
 
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 export async function getInitialState(): Promise<AdminInitialState> {
-  // 接收用户端登录页跨端口交接来的 token：存进 8002 自己的存储，随后把地址栏清理干净
+  // 接收用户端登录页跨端口交接来的 token 和用户名：存进 8002 自己的存储，随后把地址栏清理干净
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
+  const relayName = params.get('name');
   if (token) {
     localStorage.setItem('token', token);
+    if (relayName) {
+      localStorage.setItem('adminName', relayName);
+    }
     params.delete('token');
+    params.delete('name');
     const query = params.toString();
     window.history.replaceState(
       null,
@@ -27,15 +32,18 @@ export async function getInitialState(): Promise<AdminInitialState> {
       `${window.location.pathname}${query ? `?${query}` : ''}`,
     );
   }
+  // 后端 JWT 区分 user/admin 角色，admin token 访问不了 /api/user/profile，
+  // 用户名由登录页接力带过来；拿不到时回退默认名
+  const name = localStorage.getItem('adminName') || 'Admin';
   try {
     const res: any = await getSysMenu();
     const list: any[] = Array.isArray(res?.data) ? res.data : [];
     const menuPaths = list
       .map((m) => (typeof m === 'string' ? m : m?.path))
       .filter(Boolean);
-    return { name: 'Admin', menuPaths };
+    return { name, menuPaths };
   } catch {
-    return { name: 'Admin', menuPaths: [] };
+    return { name, menuPaths: [] };
   }
 }
 
@@ -46,13 +54,10 @@ export const request = {
 };
 
 export const layout: RunTimeLayoutConfig = () => {
-  console.log(
-    '[admin layout] runtime config applied, logout:',
-    typeof (() => {}),
-  );
   return {
     logout: () => {
       localStorage.removeItem('token');
+      localStorage.removeItem('adminName');
       window.location.href = WEB_LOGIN;
     },
   };
