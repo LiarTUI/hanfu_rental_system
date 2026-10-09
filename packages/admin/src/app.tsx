@@ -1,7 +1,5 @@
 // 运行时配置
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import type { RunTimeLayoutConfig } from '@umijs/max';
-import { Dropdown } from 'antd';
 import {
   WEB_LOGIN,
   createAuthResponseInterceptors,
@@ -29,8 +27,6 @@ export async function getInitialState(): Promise<AdminInitialState> {
       `${window.location.pathname}${query ? `?${query}` : ''}`,
     );
   }
-
-  // 拉取当前账号的菜单路径，供 src/access.ts 计算侧边栏显隐
   try {
     const res: any = await getSysMenu();
     const list: any[] = Array.isArray(res?.data) ? res.data : [];
@@ -49,28 +45,15 @@ export const request = {
   responseInterceptors: [createAuthResponseInterceptors(WEB_LOGIN)],
 };
 
-// 运行时 Layout 配置：头像区（icon + name）在此定制，加交互用 Dropdown 包一层
-export const layout: RunTimeLayoutConfig = ({ initialState }) => ({
-  avatarProps: {
-    icon: <UserOutlined />,
-    title: initialState?.name ?? 'Admin',
-    size: 'small',
-    render: (_props, dom) => (
-      <Dropdown
-        menu={{
-          items: [
-            { key: 'logout', icon: <LogoutOutlined />, label: '退出登录' },
-          ],
-          onClick: ({ key }) => {
-            if (key === 'logout') {
-              localStorage.removeItem('token');
-              window.location.href = WEB_LOGIN;
-            }
-          },
-        }}
-      >
-        {dom}
-      </Dropdown>
-    ),
-  },
-});
+export const layout: RunTimeLayoutConfig = () => {
+  console.log(
+    '[admin layout] runtime config applied, logout:',
+    typeof (() => {}),
+  );
+  return {
+    logout: () => {
+      localStorage.removeItem('token');
+      window.location.href = WEB_LOGIN;
+    },
+  };
+};
