@@ -1,6 +1,6 @@
-import IconFont from '@/components/IconFont';
 import { useNavigate } from '@@/exports';
 import { Button } from 'antd';
+import { IconFont } from 'shared';
 import styles from './index.less';
 // 图片后续接入方式：import scene1 from '../../assets/scene1.jpg'，然后把变量填进 img 字段
 const sceneList = [

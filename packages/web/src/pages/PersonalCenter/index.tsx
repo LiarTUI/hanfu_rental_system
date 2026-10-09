@@ -1,8 +1,8 @@
-import IconFont from '@/components/IconFont';
 import { UserOutlined } from '@ant-design/icons';
 import { useNavigate } from '@umijs/max';
 import { Avatar, Layout, message, Modal, Upload } from 'antd';
 import { useEffect, useState } from 'react';
+import { IconFont } from 'shared';
 import { getProfile, uploadAvatar } from '../../services/user';
 import styles from './index.less';
 const { Header, Sider, Content } = Layout;
@@ -201,7 +201,7 @@ function PersonalCenter() {
               <Avatar
                 className={styles.avatar}
                 src={userInfo.avatar}
-                icon={userInfo.data.avatar ? '' : <UserOutlined />}
+                icon={userInfo.avatar ? '' : <UserOutlined />}
               />
               <span className={styles.avatarMask}>更换</span>
             </div>

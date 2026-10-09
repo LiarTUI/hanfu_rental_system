@@ -1,5 +1,6 @@
 // 运行时配置
 import type { RunTimeLayoutConfig } from '@umijs/max';
+import { Button, Modal } from 'antd';
 import {
   WEB_LOGIN,
   createAuthResponseInterceptors,
@@ -56,9 +57,26 @@ export const request = {
 export const layout: RunTimeLayoutConfig = () => {
   return {
     logout: () => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('adminName');
-      window.location.href = WEB_LOGIN;
+      Modal.confirm({
+        title: '确认退出登录？',
+        content: '退出后返回登录页',
+        okText: '退出',
+        cancelText: '取消',
+        onOk: () => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('adminName');
+          window.location.href = WEB_LOGIN;
+        },
+      });
     },
+    waterMarkProps: { content: '华衿后台' },
+    layout: 'mix',
+    rightContentRender: (headerProps, dom) => (
+      <>
+        {dom} {/* dom = umi 默认那份:头像+名字+退出 dropdown */}
+        <Button>帮助</Button> {/* 自己追加的元素,排在它右边 */}
+      </>
+    ),
+    siderWidth: 240,
   };
 };

@@ -66,6 +66,12 @@ importers:
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.4
+      '@types/react':
+        specifier: ^18.0.33
+        version: 18.3.31
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
 
   packages/web:
     dependencies:

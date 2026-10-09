@@ -1,5 +1,6 @@
 import type { CSSProperties, MouseEventHandler } from 'react';
-interface IconFontProps {
+
+export interface IconFontProps {
   type: string;
   size?: number;
   color?: string;
@@ -9,7 +10,8 @@ interface IconFontProps {
   click?: boolean;
 }
 
-export default function IconFont({
+// 阿里 iconfont Symbol 渲染组件：图标资源由各 app 在 .umirc.ts 的 headScripts 自行引入
+export function IconFont({
   type,
   size = 16,
   color,
