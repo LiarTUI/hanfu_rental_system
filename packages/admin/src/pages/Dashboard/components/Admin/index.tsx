@@ -3,11 +3,12 @@ import { getAllOrders } from '@/services/orders';
 import { getStores } from '@/services/store';
 import { getAllUsers } from '@/services/users';
 import { Col, Row } from 'antd';
+import type { EChartsOption } from 'echarts';
+import ReactEcharts from 'echarts-for-react';
 import { useEffect, useState } from 'react';
 import { IconFont } from 'shared';
 import type { ComponentProps } from '../type';
 import styles from './index.less';
-
 export default function Admin(props: ComponentProps) {
   const [stores, setStores] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
@@ -74,7 +75,11 @@ export default function Admin(props: ComponentProps) {
       } catch {}
     })();
   }, []);
-
+  const option: EChartsOption = {
+    xAxis: { type: 'category', data: ['周一', '周二'] },
+    yAxis: {},
+    series: [{ type: 'bar', data: [120, 200] }],
+  };
   return (
     <div>
       <Row align={'middle'} gutter={[20, 20]} wrap={true}>
@@ -94,6 +99,15 @@ export default function Admin(props: ComponentProps) {
             </Col>
           );
         })}
+      </Row>
+      <Row>
+        <Col xl={12}>
+          <ReactEcharts
+            option={option}
+            style={{ height: '400px' }}
+            autoResize
+          />
+        </Col>
       </Row>
     </div>
   );

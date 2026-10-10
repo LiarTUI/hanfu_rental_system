@@ -11,6 +11,8 @@
     "@ant-design/pro-components": "^2.4.4",
     "@umijs/max": "^4.7.22",
     "antd": "^5.4.0",
+    "echarts": "^6.1.0",
+    "echarts-for-react": "^3.0.6",
     "shared": "workspace:*"
   },
   "devDependencies": {
