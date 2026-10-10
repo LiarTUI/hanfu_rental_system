@@ -18,11 +18,15 @@ export async function getInitialState(): Promise<AdminInitialState> {
   // 接收用户端登录页跨端口交接来的 token 和用户名：存进 8002 自己的存储，随后把地址栏清理干净
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
+  const storeid = params.get('storeid');
   const relayName = params.get('name');
   if (token) {
     localStorage.setItem('token', token);
     if (relayName) {
       localStorage.setItem('adminName', relayName);
+    }
+    if (storeid) {
+      localStorage.setItem('storeid', storeid);
     }
     params.delete('token');
     params.delete('name');
@@ -56,6 +60,7 @@ export const request = {
 
 export const layout: RunTimeLayoutConfig = () => {
   return {
+    logo: '/manageLogo.svg',
     logout: () => {
       Modal.confirm({
         title: '确认退出登录？',

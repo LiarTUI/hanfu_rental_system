@@ -2,7 +2,7 @@ import CountUp from '@/components/CountUp';
 import { getAllOrders } from '@/services/orders';
 import { getStores } from '@/services/store';
 import { getAllUsers } from '@/services/users';
-import { Col, Row } from 'antd';
+import { Col, Divider, Row } from 'antd';
 import type { EChartsOption } from 'echarts';
 import ReactEcharts from 'echarts-for-react';
 import { useEffect, useState } from 'react';
@@ -80,12 +80,17 @@ export default function Admin(props: ComponentProps) {
     yAxis: {},
     series: [{ type: 'bar', data: [120, 200] }],
   };
+  const option2: EChartsOption = {
+    xAxis: { type: 'category', data: ['周一', '周二'] },
+    yAxis: {},
+    series: [{ type: 'bar', data: [120, 200] }],
+  };
   return (
     <div>
       <Row align={'middle'} gutter={[20, 20]} wrap={true}>
         {headerCards.map((item, index) => {
           return (
-            <Col xs={24} sm={12} xl={6} className={styles.col}>
+            <Col xs={24} sm={12} xl={6} className={styles.col} key={item.label}>
               <div className={styles.headerCard}>
                 {/* todo 去找icon*/}
                 <IconFont type={item.icon} size={24} className={styles.icon} />
@@ -100,13 +105,30 @@ export default function Admin(props: ComponentProps) {
           );
         })}
       </Row>
-      <Row>
-        <Col xl={12}>
-          <ReactEcharts
-            option={option}
-            style={{ height: '400px' }}
-            autoResize
-          />
+      <Divider style={{ opacity: 0 }}></Divider>
+      <Row gutter={[20, 20]} className={styles.chartRow}>
+        <Col span={24}>
+          <div className={styles.smallEcharts}>
+            <ReactEcharts option={option} autoResize />
+          </div>
+        </Col>
+      </Row>
+      <Divider style={{ opacity: 0 }}></Divider>
+      <Row gutter={[20, 20]} className={styles.chartRow}>
+        <Col span={8}>
+          <div className={styles.smallEcharts}>
+            <ReactEcharts option={option2} autoResize />
+          </div>
+        </Col>
+        <Col span={8}>
+          <div className={styles.smallEcharts}>
+            <ReactEcharts option={option2} autoResize />
+          </div>
+        </Col>
+        <Col span={8}>
+          <div className={styles.smallEcharts}>
+            <ReactEcharts option={option2} autoResize />
+          </div>
         </Col>
       </Row>
     </div>

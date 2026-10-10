@@ -4,21 +4,24 @@
 
 .headerCard {
   position: relative;
-  height: 140px;
+  height: 120px;
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   display: flex;
   align-items: center;
   padding: 20px;
   background-color: #fff;
+
   .info {
     margin-left: auto;
     min-width: 90px;
     text-align: center;
+
     span {
       display: block;
       letter-spacing: 2px;
       font-weight: 700;
+
       &:nth-child(1) {
         color: rgba(0, 0, 0, 0.45);
         font-family: 'Helvetica Neue';
@@ -39,5 +42,13 @@
   .icon {
     position: absolute;
     fill: black;
+  }
+}
+
+.chartRow {
+  .smallEcharts {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   }
 }
