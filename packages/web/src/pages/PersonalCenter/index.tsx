@@ -99,9 +99,11 @@ function PersonalCenter() {
   const [userInfo, setUserInfo] = useState<{
     username: string;
     avatar: string;
+    data: any;
   }>({
     username: '',
     avatar: '',
+    data: [],
   });
   // 更换头像弹层
   const [avatarOpen, setAvatarOpen] = useState(false);
@@ -116,7 +118,11 @@ function PersonalCenter() {
     try {
       const res = await getProfile();
       if (res.success) {
-        setUserInfo({ username: res.username ?? '', avatar: res.avatar ?? '' });
+        setUserInfo({
+          username: res.username ?? '',
+          avatar: res.avatar ?? '',
+          data: res.data ?? [],
+        });
       }
     } catch (e) {
       console.log(e);

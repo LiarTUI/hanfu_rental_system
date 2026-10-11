@@ -2,6 +2,8 @@ import { defineConfig } from '@umijs/max';
 import { resolve } from 'path';
 import { address } from 'shared';
 export default defineConfig({
+  base: '/admin/',
+  publicPath: '/admin/',
   antd: {},
   model: {},
   initialState: {},
