@@ -1,8 +1,8 @@
-import IconFont from '@/components/IconFont';
 import { CalendarOutlined } from '@ant-design/icons';
 import { DatePicker, message } from 'antd';
 import type { Dayjs } from 'dayjs';
 import { useState } from 'react';
+import { IconFont } from 'shared';
 import styles from './index.less';
 
 const { RangePicker } = DatePicker;

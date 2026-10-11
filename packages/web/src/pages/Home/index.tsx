@@ -1,9 +1,9 @@
-import IconFont from '@/components/IconFont';
 import { useNavigate } from '@@/exports';
 import { UserOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
 import { Avatar, ConfigProvider, Layout, message, Tabs } from 'antd';
 import { useEffect, useState } from 'react';
+import { IconFont } from 'shared';
 import { getProfile } from '../../services/user';
 import Home from './components/home';
 import KnowLedge from './components/knowLedge';

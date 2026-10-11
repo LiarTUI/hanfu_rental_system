@@ -20,9 +20,14 @@ function LoginForm({ role }: LoginFormProps) {
       if (res.success) {
         message.success('登录成功！');
         if (role === 'admin') {
-          window.location.href = `${ADMIN_HOME}?token=${encodeURIComponent(
-            res.data.token,
-          )}`;
+          console.log(res);
+          // 后端没有 admin 档案查询接口，用户名随 token 一起接力给后台显示
+          const params = new URLSearchParams({
+            token: res.data.token,
+            storeid: res.data.storeid,
+            ...(res.data.username ? { name: res.data.username } : {}),
+          });
+          window.location.href = `${ADMIN_HOME}?${params.toString()}`;
           return;
         }
         localStorage.setItem('token', res.data.token);

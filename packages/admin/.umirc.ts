@@ -9,6 +9,8 @@ export default defineConfig({
   initialState: {},
   access: {},
   request: {},
+  favicons: ['/ll.svg'],
+  headScripts: ['https://at.alicdn.com/t/c/font_5240047_8oal9bcdk3o.js'],
   layout: {
     title: '华衿后台',
     locale: false,

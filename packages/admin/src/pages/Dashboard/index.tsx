@@ -1,20 +1,20 @@
-import ll from '@/assets/ll.svg';
 import { PageContainer } from '@ant-design/pro-components';
-import { Image } from 'antd';
+import { useMemo } from 'react';
+import Admin from './components/Admin/index';
+import Store from './components/Store/index';
+import styles from './index.less';
 function Dashboard() {
+  const storeid = Number(localStorage.getItem('storeid'));
+  const component = useMemo(() => {
+    if (storeid === 0) {
+      return <Admin></Admin>;
+    } else {
+      return <Store></Store>;
+    }
+  }, [storeid]);
   return (
-    <PageContainer>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Image src={ll}></Image>
-        <h1 style={{ color: 'red' }}>看老子屏幕cnmd</h1>
-        <h1 style={{ color: 'red' }}>听过没有</h1>
-      </div>
+    <PageContainer className={styles.pageContainer}>
+      <div className={styles.pageHeader}>{component}</div>
     </PageContainer>
   );
 }
