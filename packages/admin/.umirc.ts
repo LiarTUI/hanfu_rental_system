@@ -1,6 +1,6 @@
 import { defineConfig } from '@umijs/max';
 import { resolve } from 'path';
-import { address } from 'shared';
+import { address } from '../shared/src/backendAddress';
 export default defineConfig({
   base: '/admin/',
   publicPath: '/admin/',
