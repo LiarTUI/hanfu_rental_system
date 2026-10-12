@@ -1,7 +1,7 @@
 import { useTableSearch } from '@/hooks/useTableSearch';
 import { getAllProducts } from '@/services/products';
 import type { TableColumnsType } from 'antd';
-import { Image, Input, Select, Table, Tag } from 'antd';
+import { Image, Input, Select, Space, Table, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import type { ProductData } from './type';
 
@@ -113,23 +113,22 @@ function ProductList() {
 
   return (
     <div>
-      <Input.Search
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        allowClear
-        addonBefore={
-          <Select
-            value={searchField}
-            onChange={onFieldChange}
-            options={SEARCH_FIELDS}
-            style={{ width: 100 }}
-          />
-        }
-        placeholder={`搜索${
-          SEARCH_FIELDS.find((f) => f.value === searchField)?.label ?? ''
-        }`}
-        style={{ width: 320, marginBottom: 16 }}
-      />
+      <Space.Compact style={{ width: 320, marginBottom: 16 }}>
+        <Select
+          value={searchField}
+          onChange={onFieldChange}
+          options={SEARCH_FIELDS}
+          style={{ width: 100 }}
+        />
+        <Input.Search
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          allowClear
+          placeholder={`搜索${
+            SEARCH_FIELDS.find((f) => f.value === searchField)?.label ?? ''
+          }`}
+        />
+      </Space.Compact>
       <Table
         rowKey="id"
         columns={columns}
