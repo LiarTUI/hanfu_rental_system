@@ -2,8 +2,8 @@ import { defineConfig } from '@umijs/max';
 import { resolve } from 'path';
 import { address } from '../shared/src/backendAddress';
 export default defineConfig({
-  base: '/admin/',
-  publicPath: '/admin/',
+  base: '/',
+  publicPath: '/',
   antd: {},
   model: {},
   initialState: {},
@@ -19,7 +19,8 @@ export default defineConfig({
   routes: [
     {
       path: '/',
-      redirect: '/dashboard',
+      layout: false,
+      component: '@/pages/Login',
     },
     {
       path: '/dashboard',

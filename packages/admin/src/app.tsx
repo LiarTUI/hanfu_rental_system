@@ -2,7 +2,6 @@
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { Button, Modal } from 'antd';
 import {
-  WEB_LOGIN,
   createAuthResponseInterceptors,
   tokenRequestInterceptor,
 } from 'shared';
@@ -13,32 +12,20 @@ interface AdminInitialState {
   menuPaths: string[];
 }
 
+// 登录页挂在根路由（与 web 端一致），双端口部署（web 8000 / admin 8002）
+const LOGIN_URL = '/';
+
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 export async function getInitialState(): Promise<AdminInitialState> {
-  // 接收用户端登录页跨端口交接来的 token 和用户名：存进 8002 自己的存储，随后把地址栏清理干净
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('token');
-  const storeid = params.get('storeid');
-  const relayName = params.get('name');
-  if (token) {
-    localStorage.setItem('token', token);
-    if (relayName) {
-      localStorage.setItem('adminName', relayName);
+  // 未登录直接送回登录页（登录页自身除外）；token 失效场景由 401 拦截器兜底
+  if (!localStorage.getItem('token')) {
+    if (window.location.pathname !== LOGIN_URL) {
+      window.location.replace(LOGIN_URL);
     }
-    if (storeid) {
-      localStorage.setItem('storeid', storeid);
-    }
-    params.delete('token');
-    params.delete('name');
-    const query = params.toString();
-    window.history.replaceState(
-      null,
-      '',
-      `${window.location.pathname}${query ? `?${query}` : ''}`,
-    );
+    return { name: '', menuPaths: [] };
   }
   // 后端 JWT 区分 user/admin 角色，admin token 访问不了 /api/user/profile，
-  // 用户名由登录页接力带过来；拿不到时回退默认名
+  // 用户名在登录成功时存进 adminName；拿不到时回退默认名
   const name = localStorage.getItem('adminName') || 'Admin';
   try {
     const res: any = await getSysMenu();
@@ -54,8 +41,8 @@ export async function getInitialState(): Promise<AdminInitialState> {
 
 export const request = {
   requestInterceptors: [tokenRequestInterceptor],
-  // 失效登出：admin 自己没有登录页，统一踢回用户端登录页
-  responseInterceptors: [createAuthResponseInterceptors(WEB_LOGIN)],
+  // 失效登出：admin 有自己的登录页了，不再跨端口踢回用户端
+  responseInterceptors: [createAuthResponseInterceptors(LOGIN_URL)],
 };
 
 export const layout: RunTimeLayoutConfig = () => {
@@ -70,7 +57,8 @@ export const layout: RunTimeLayoutConfig = () => {
         onOk: () => {
           localStorage.removeItem('token');
           localStorage.removeItem('adminName');
-          window.location.href = WEB_LOGIN;
+          localStorage.removeItem('storeid');
+          window.location.href = LOGIN_URL;
         },
       });
     },

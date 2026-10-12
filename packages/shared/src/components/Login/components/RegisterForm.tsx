@@ -1,6 +1,6 @@
 import { Button, Form, Input, message } from 'antd';
 import { useState } from 'react';
-import { register } from '../../../services/user';
+import { register } from '../../../services/auth';
 import type { formData } from '../type';
 
 interface RegisterFormProps {

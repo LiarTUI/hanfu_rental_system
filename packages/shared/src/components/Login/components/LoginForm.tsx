@@ -1,16 +1,17 @@
-import { useNavigate } from '@umijs/max';
 import { Button, Form, Input, message } from 'antd';
 import { useEffect, useState } from 'react';
-import { ADMIN_HOME } from 'shared';
-import { login } from '../../../services/user';
+import { login } from '../../../services/auth';
 import type { formData } from '../type';
 
 interface LoginFormProps {
   role: 'user' | 'admin';
+  /** 登录成功 / 已登录时跳转的地址 */
+  homePath: string;
+  /** 登录成功后的额外副作用，如 admin 端存 adminName/storeid */
+  onLoginSuccess?: (data: any) => void;
 }
 
-function LoginForm({ role }: LoginFormProps) {
-  const navigate = useNavigate();
+function LoginForm({ role, homePath, onLoginSuccess }: LoginFormProps) {
   const [loading, setLoading] = useState(false);
 
   const onFinish = async (values: formData) => {
@@ -19,19 +20,11 @@ function LoginForm({ role }: LoginFormProps) {
       const res = await login(values, role);
       if (res.success) {
         message.success('登录成功！');
-        if (role === 'admin') {
-          console.log(res);
-          // 后端没有 admin 档案查询接口，用户名随 token 一起接力给后台显示
-          const params = new URLSearchParams({
-            token: res.data.token,
-            storeid: res.data.storeid,
-            ...(res.data.username ? { name: res.data.username } : {}),
-          });
-          window.location.href = `${ADMIN_HOME}?${params.toString()}`;
-          return;
-        }
         localStorage.setItem('token', res.data.token);
-        navigate('/home', { replace: true });
+        onLoginSuccess?.(res.data);
+        // 整页跳转而非 SPA navigate：admin 的菜单/初始状态在 getInitialState
+        // 里拉取，不整页刷新会停留在空菜单的后台
+        window.location.href = homePath;
         return;
       }
       message.error(res.errorMsg);
@@ -42,11 +35,13 @@ function LoginForm({ role }: LoginFormProps) {
     }
   };
 
+  // 已登录直接进主页
   useEffect(() => {
     if (localStorage.getItem('token')) {
-      navigate('/home', { replace: true });
+      window.location.href = homePath;
     }
-  }, [navigate]);
+  }, [homePath]);
+
   return (
     <Form onFinish={onFinish} name={`login-${role}`}>
       <Form.Item
@@ -54,16 +49,11 @@ function LoginForm({ role }: LoginFormProps) {
         rules={[
           {
             required: true,
-            message: role === 'admin' ? '请输入管理员/商家账号' : '请输入账号',
+            message: '请输入账号',
           },
         ]}
       >
-        <Input
-          placeholder={
-            role === 'admin' ? '请输入管理员/商家账号' : '请输入账号'
-          }
-          autoComplete="username"
-        ></Input>
+        <Input placeholder={'请输入账号'} autoComplete="username"></Input>
       </Form.Item>
       <Form.Item
         name="password"

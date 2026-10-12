@@ -15,6 +15,11 @@ export default function MemberList() {
       key: 'phone',
       dataIndex: 'phone',
     },
+    {
+      title: '注册时间',
+      key: 'createTime',
+      dataIndex: 'createTime',
+    },
   ];
   useEffect(() => {
     initData();

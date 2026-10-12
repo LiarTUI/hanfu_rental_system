@@ -7,9 +7,13 @@
   "devDependencies": {
     "@types/node": "^26.6.4",
     "@types/react": "^18.0.33",
+    "@umijs/max": "^4.7.22",
+    "antd": "^5.4.0",
     "react": "^18.0.0"
   },
   "peerDependencies": {
+    "@umijs/max": "^4.7.22",
+    "antd": "^5.4.0",
     "react": "^18.0.0"
   }
 }
