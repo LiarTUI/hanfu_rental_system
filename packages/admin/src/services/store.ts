@@ -1,4 +1,4 @@
 import { request } from '@umijs/max';
 export const getStores = () => {
-  return request('/api/store/list');
+  return request('/api/admin/store/list');
 };

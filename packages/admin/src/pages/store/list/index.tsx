@@ -1,40 +1,30 @@
+import { getStores } from '@/services/store';
 import { Table, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import type { StoreData } from './type';
-
-// TODO 后端接口就绪后，把 setStores(mockStores) 换成
-// const res = await getStores(); setStores(res?.data ?? [])
-// （getStores 已存在于 @/services/store，路径 /api/store/list）
-const mockStores: StoreData[] = [
-  {
-    id: 1,
-    name: '华衿旗舰店',
-    address: '杭州市西湖区文三路 100 号',
-    status: 1,
-    createTime: '2026-08-01 09:00:00',
-  },
-  {
-    id: 2,
-    name: '云锦小铺',
-    address: '苏州市姑苏区平江路 22 号',
-    status: 1,
-    createTime: '2026-08-15 16:30:00',
-  },
-  {
-    id: 3,
-    name: '苏绣工坊',
-    address: '南京市秦淮区夫子庙 8 号',
-    status: 0,
-    createTime: '2026-09-02 11:20:00',
-  },
-];
 
 function StoreList() {
   const [stores, setStores] = useState<StoreData[]>([]);
 
   const columns = [
     { title: '店铺名称', dataIndex: 'name', key: 'name' },
+    { title: '联系人', dataIndex: 'contactName', key: 'contactName' },
+    { title: '联系电话', dataIndex: 'contactPhone', key: 'contactPhone' },
     { title: '地址', dataIndex: 'address', key: 'address' },
+    {
+      title: '佣金率',
+      dataIndex: 'commissionRate',
+      key: 'commissionRate',
+      // 约定口径 0.10 = 10%；后端若给了非数字（字段名不符/"10%" 字符串等），
+      // 回退显示原值，避免整列 NaN
+      render: (v: number | string | null) => {
+        if (v === null || v === undefined || v === '') return '-';
+        const n = Number(v);
+        return Number.isNaN(n)
+          ? String(v)
+          : `${(n * 100).toFixed(1).replace(/\.0$/, '')}%`;
+      },
+    },
     {
       title: '状态',
       dataIndex: 'status',
@@ -46,8 +36,14 @@ function StoreList() {
   ];
 
   useEffect(() => {
-    setStores(mockStores);
+    initData();
   }, []);
+
+  const initData = async () => {
+    const res = await getStores();
+    // umi request 返回整个响应对象，店铺列表在 res.data 里
+    setStores(res?.data ?? []);
+  };
 
   return (
     <div>
