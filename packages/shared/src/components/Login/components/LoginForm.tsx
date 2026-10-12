@@ -7,11 +7,18 @@ interface LoginFormProps {
   role: 'user' | 'admin';
   /** 登录成功 / 已登录时跳转的地址 */
   homePath: string;
+  /** token 存储的 localStorage key，同域部署时 web/admin 隔离用 */
+  tokenKey?: string;
   /** 登录成功后的额外副作用，如 admin 端存 adminName/storeid */
   onLoginSuccess?: (data: any) => void;
 }
 
-function LoginForm({ role, homePath, onLoginSuccess }: LoginFormProps) {
+function LoginForm({
+  role,
+  homePath,
+  tokenKey = 'token',
+  onLoginSuccess,
+}: LoginFormProps) {
   const [loading, setLoading] = useState(false);
 
   const onFinish = async (values: formData) => {
@@ -20,7 +27,7 @@ function LoginForm({ role, homePath, onLoginSuccess }: LoginFormProps) {
       const res = await login(values, role);
       if (res.success) {
         message.success('登录成功！');
-        localStorage.setItem('token', res.data.token);
+        localStorage.setItem(tokenKey, res.data.token);
         onLoginSuccess?.(res.data);
         // 整页跳转而非 SPA navigate：admin 的菜单/初始状态在 getInitialState
         // 里拉取，不整页刷新会停留在空菜单的后台
@@ -37,10 +44,10 @@ function LoginForm({ role, homePath, onLoginSuccess }: LoginFormProps) {
 
   // 已登录直接进主页
   useEffect(() => {
-    if (localStorage.getItem('token')) {
+    if (localStorage.getItem(tokenKey)) {
       window.location.href = homePath;
     }
-  }, [homePath]);
+  }, [homePath, tokenKey]);
 
   return (
     <Form onFinish={onFinish} name={`login-${role}`}>

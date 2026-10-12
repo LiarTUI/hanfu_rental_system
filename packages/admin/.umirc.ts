@@ -1,15 +1,21 @@
 import { defineConfig } from '@umijs/max';
 import { resolve } from 'path';
 import { address } from '../shared/src/backendAddress';
+
+// 生产同域路径部署：admin 挂 /admin 前缀（base 路由 + publicPath 静态资源 + favicon 都要带上）；
+// 开发保持双端口无前缀
+const isProd = process.env.NODE_ENV === 'production';
+const prefix = isProd ? '/admin' : '';
+
 export default defineConfig({
-  base: '/',
-  publicPath: '/',
+  base: `${prefix}/`,
+  publicPath: `${prefix}/`,
   antd: {},
   model: {},
   initialState: {},
   access: {},
   request: {},
-  favicons: ['/ll.svg'],
+  favicons: [`${prefix}/ll.svg`],
   headScripts: ['https://at.alicdn.com/t/c/font_5240047_8oal9bcdk3o.js'],
   layout: {
     title: '华衿后台',

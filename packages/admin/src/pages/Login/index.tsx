@@ -1,10 +1,12 @@
+import { ADMIN_BASE, ADMIN_TOKEN_KEY } from '@/constants';
 import { LoginPage } from 'shared';
 
 function Login() {
   return (
     <LoginPage
       roles={['admin']}
-      homePath="/dashboard"
+      homePath={`${ADMIN_BASE}/dashboard`}
+      tokenKey={ADMIN_TOKEN_KEY}
       onLoginSuccess={(data) => {
         // adminName：后端 admin token 访问不了 user 体系 profile，
         // 顶栏用户名只能登录时存下来

@@ -20,6 +20,8 @@ interface LoginPageProps {
   homePath: string;
   /** 登录成功后的额外副作用，如 admin 端存 adminName/storeid */
   onLoginSuccess?: (data: any, role: LoginRole) => void;
+  /** token 存储的 localStorage key，同域部署时 web/admin 需不同 key 隔离 */
+  tokenKey?: string;
 }
 
 function LoginPage({
@@ -28,6 +30,7 @@ function LoginPage({
   showRegister = false,
   homePath,
   onLoginSuccess,
+  tokenKey = 'token',
 }: LoginPageProps) {
   const [type, setType] = useState<TabType>(defaultRole ?? roles[0]);
   const singleRole = roles.length === 1;
@@ -82,6 +85,7 @@ function LoginPage({
               <LoginForm
                 role="user"
                 homePath={homePath}
+                tokenKey={tokenKey}
                 onLoginSuccess={(data) => onLoginSuccess?.(data, 'user')}
               />
             )}
@@ -89,6 +93,7 @@ function LoginPage({
               <LoginForm
                 role="admin"
                 homePath={homePath}
+                tokenKey={tokenKey}
                 onLoginSuccess={(data) => onLoginSuccess?.(data, 'admin')}
               />
             )}
