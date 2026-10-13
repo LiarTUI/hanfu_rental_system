@@ -1,10 +1,10 @@
 import { useTableSearch } from '@/hooks/useTableSearch';
 import { getAllOrders } from '@/services/orders';
 import type { TableColumnsType } from 'antd';
-import { Input, Select, Space, Table, Tag } from 'antd';
+import { Input, Select, Space, Tag } from 'antd';
 import { useEffect, useState } from 'react';
+import { CustomTable } from 'shared';
 import { ORDER_STATUS, type OrderData } from './type';
-
 // 搜索范围限定：选中的字段才参与关键词匹配
 const SEARCH_FIELDS: { label: string; value: keyof OrderData }[] = [
   { label: '订单号', value: 'orderNo' },
@@ -124,11 +124,27 @@ function List() {
           }`}
         />
       </Space.Compact>
-      <Table
+      <CustomTable
         bordered
         rowKey="id"
         columns={columns}
-        dataSource={filtered}
+        data={filtered}
+        // 操作列：详情（全状态）、发货（仅待发货）、关闭（危险+确认）
+        // 后端修改类接口就绪前先占位，onClick 里接真实请求
+        actions={[
+          {
+            key: 'detail',
+            label: '详情',
+            onClick: (r) => console.log('订单详情', r.id),
+          },
+          {
+            key: 'close',
+            label: '关闭',
+            danger: true,
+            confirm: '确定关闭该订单？',
+            onClick: (r) => console.log('关闭订单', r.id),
+          },
+        ]}
         scroll={{ x: 'max-content' }}
       />
     </div>
