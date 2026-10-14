@@ -1,0 +1,58 @@
+// 发货管理页视觉：对齐 Dashboard 的圆角卡片 + 柔和阴影风格
+.card {
+  min-height: 110px;
+  border-radius: 10px;
+  padding: 20px 24px;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+  }
+
+  .label {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    opacity: 0.9;
+  }
+
+  .count {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+
+  // 当前 Tab 对应的统计卡：主题色描边高亮
+  &.active {
+    outline: 3px solid rgba(22, 119, 255, 0.45);
+    outline-offset: 2px;
+  }
+
+  // 无对应 Tab 的状态卡：纯展示，禁用交互
+  &.disabled {
+    cursor: default;
+    opacity: 0.75;
+
+    &:hover {
+      transform: none;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    }
+  }
+}
+
+.panel {
+  margin-top: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  padding: 8px 20px 20px;
+}

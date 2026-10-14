@@ -4,3 +4,12 @@ import { request } from '@umijs/max';
 export const getAllProducts = () => {
   return request('/api/admin/product/list');
 };
+
+// SKU 台账（GET /api/admin/sku/list）
+// 两参数都可选：不传返回全部，按入库时间倒序
+export const getSkus = (params?: {
+  productId?: number;
+  condition?: number;
+}) => {
+  return request('/api/admin/sku/list', { params });
+};

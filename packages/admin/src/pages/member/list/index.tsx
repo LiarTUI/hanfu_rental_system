@@ -1,6 +1,8 @@
 import { useTableSearch } from '@/hooks/useTableSearch';
 import { getAllUsers } from '@/services/users';
-import { Input, Select, Space, Table } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
+import type { TableColumnsType } from 'antd';
+import { Avatar, Input, Select, Space, Table, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import type { UserData } from './type';
 
@@ -10,6 +12,10 @@ const SEARCH_FIELDS: { label: string; value: keyof UserData }[] = [
   { label: '手机号', value: 'phone' },
 ];
 
+/** 信用分 → 颜色（芝麻分式 350~950，越高越好） */
+const creditColor = (v: number) =>
+  v >= 700 ? 'green' : v >= 550 ? 'blue' : 'red';
+
 export default function MemberList() {
   const [members, setMembers] = useState<UserData[]>([]);
   const [searchField, setSearchField] = useState<keyof UserData>('username');
@@ -18,19 +24,50 @@ export default function MemberList() {
     searchField,
   ]);
 
-  const columns = [
+  const columns: TableColumnsType<UserData> = [
     {
-      title: '用户名',
+      title: '用户',
       key: 'username',
       dataIndex: 'username',
-      width: 200,
+      width: 220,
       ellipsis: true,
+      render: (name, r) => (
+        <Space>
+          {/* avatar 为相对路径走 dev proxy；缺失或加载失败自动回退人形图标 */}
+          <Avatar src={r.avatar ?? undefined} icon={<UserOutlined />} />
+          {name}
+        </Space>
+      ),
     },
     {
       title: '联系方式',
       key: 'phone',
       dataIndex: 'phone',
       width: 160,
+    },
+    {
+      title: '身高/体重',
+      key: 'body',
+      width: 130,
+      render: (_, r) =>
+        r.height != null && r.weight != null
+          ? `${r.height}cm / ${r.weight}kg`
+          : '—',
+    },
+    {
+      title: '体型',
+      key: 'bodyShape',
+      dataIndex: 'bodyShape',
+      width: 100,
+      render: (v: string | null) => (v ? <Tag>{v}</Tag> : '—'),
+    },
+    {
+      title: '信用分',
+      key: 'creditScore',
+      dataIndex: 'creditScore',
+      width: 100,
+      render: (v: number | undefined) =>
+        v != null ? <Tag color={creditColor(v)}>{v}</Tag> : '—',
     },
     {
       title: '注册时间',

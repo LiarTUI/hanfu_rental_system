@@ -30,4 +30,5 @@ export type CustomTableProps<T> = TableProps<T> & {
   data?: T[];
   /** 传入则自动追加为最后一列：固定右侧、默认宽 120、超过 3 个折叠进"更多" */
   actions?: TableActionItem<T>[];
+  shadow?: boolean;
 };

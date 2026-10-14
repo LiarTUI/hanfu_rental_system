@@ -7,8 +7,8 @@ import {
   Space,
   Table,
 } from 'antd';
+import styles from './index.less';
 import type { CustomTableProps, TableActionItem } from './type';
-
 /** 平铺按钮上限，超出部分折叠进"更多"下拉 */
 const MAX_INLINE = 3;
 
@@ -107,6 +107,7 @@ export default function CustomTable<T extends object>({
   data,
   actions,
   columns,
+  shadow,
   ...rest
 }: CustomTableProps<T>) {
   const finalColumns = [...(columns ?? [])];
@@ -119,6 +120,7 @@ export default function CustomTable<T extends object>({
       render: (_, record) => renderActions(actions, record),
     });
   }
+  const ComputedStyles = `${shadow ? styles.boxShadow : ''}`;
   return (
     <ConfigProvider
       theme={{
@@ -129,17 +131,28 @@ export default function CustomTable<T extends object>({
             headerColor: '#1d2129',
             headerSplitColor: 'transparent',
             // 表头圆角
-            headerBorderRadius: 8,
+            headerBorderRadius: 12,
             // 行悬浮：柔和的灰色高亮
-            rowHoverBg: '#f5f7fa',
+            rowHoverBg: '#9ab8e6',
             // 单元格内边距，行高更透气
             cellPaddingBlock: 12,
             cellPaddingInline: 16,
           },
+          Pagination: {
+            itemBg: '#ffffff', // 页码默认底色
+            itemActiveBg: '#3066b6', // 当前页底色
+            itemActiveColor: '#ffffff', // 当前页文字色
+            itemActiveColorHover: '#ffffff', // 当前页 hover 文字色
+          },
         },
       }}
     >
-      <Table<T> {...rest} columns={finalColumns} dataSource={data} />
+      <Table<T>
+        className={ComputedStyles}
+        {...rest}
+        columns={finalColumns}
+        dataSource={data}
+      />
     </ConfigProvider>
   );
 }
