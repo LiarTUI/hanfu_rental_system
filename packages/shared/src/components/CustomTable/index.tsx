@@ -159,9 +159,6 @@ export default function CustomTable<T extends object>({
             headerBorderRadius: 12,
             // 行悬浮：柔和的灰色高亮
             rowHoverBg: '#9ab8e6',
-            // 单元格内边距，行高更透气
-            cellPaddingBlock: 12,
-            cellPaddingInline: 16,
           },
           // 分页器是独立组件，token 必须写在 Pagination 下而不是 Table 下
           // （Table 的组件 token 里没有任何 pagination* 字段）
@@ -184,6 +181,7 @@ export default function CustomTable<T extends object>({
                 <Col span={(24 / searchFields?.length) * 6 - 6}>
                   <FormRender
                     type="input"
+                    label={f.label}
                     configs={{
                       key: key,
                       value: formData[key] ?? '',
@@ -203,6 +201,16 @@ export default function CustomTable<T extends object>({
             })}
             <Col>
               <Button onClick={() => setKeywords(formData)}>搜索</Button>
+            </Col>
+            <Col>
+              <Button
+                onClick={() => {
+                  setKeywords({});
+                  setFormData({});
+                }}
+              >
+                重置
+              </Button>
             </Col>
           </Row>
         </Space>
