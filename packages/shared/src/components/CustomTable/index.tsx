@@ -1,12 +1,16 @@
 import {
   Button,
+  Col,
   ConfigProvider,
   Dropdown,
   Modal,
   Popconfirm,
+  Row,
   Space,
   Table,
 } from 'antd';
+import { useMemo, useState } from 'react';
+import FormRender from '../formRender';
 import styles from './index.less';
 import type { CustomTableProps, TableActionItem } from './type';
 /** 平铺按钮上限，超出部分折叠进"更多"下拉 */
@@ -101,15 +105,36 @@ function renderActions<T extends object>(
  * - 泛型 <T> 让列定义与行数据共用同一类型
  * - data 即 dataSource 的别名，其余 Table props 原样透传
  * - actions 传入则自动追加为最后一列（固定右侧、超量折叠、危险确认）
+ * - searchFields 传入则在表格上方平铺渲染搜索框，多框 AND 客户端过滤
  * - ConfigProvider 统一两端表格主题（配色/圆角等）
  */
 export default function CustomTable<T extends object>({
   data,
   actions,
   columns,
+  searchFields,
   shadow,
   ...rest
 }: CustomTableProps<T>) {
+  // 每个搜索字段一个独立关键词，key 用字段名
+  const [keywords, setKeywords] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState<Record<string, string>>({});
+  // 平铺搜索的客户端过滤：各词只匹配自己负责的字段，多框之间 AND；
+  // 后端上分页后应改为 query 参数服务端过滤，届时这里换数据层即可
+  const filteredData = useMemo(() => {
+    const list = data ?? [];
+    if (!searchFields?.length) return list;
+    return list.filter((item) =>
+      searchFields.every((f) => {
+        const kw = (keywords[String(f.field)] ?? '').trim().toLowerCase();
+        if (!kw) return true;
+        return String(item[f.field] ?? '')
+          .toLowerCase()
+          .includes(kw);
+      }),
+    );
+  }, [data, keywords, searchFields]);
+
   const finalColumns = [...(columns ?? [])];
   if (actions?.length) {
     finalColumns.push({
@@ -138,6 +163,8 @@ export default function CustomTable<T extends object>({
             cellPaddingBlock: 12,
             cellPaddingInline: 16,
           },
+          // 分页器是独立组件，token 必须写在 Pagination 下而不是 Table 下
+          // （Table 的组件 token 里没有任何 pagination* 字段）
           Pagination: {
             itemBg: '#ffffff', // 页码默认底色
             itemActiveBg: '#3066b6', // 当前页底色
@@ -147,14 +174,47 @@ export default function CustomTable<T extends object>({
         },
       }}
     >
+      {/* 平铺搜索区：每字段一个独立搜索框，窄屏自动换行 */}
+      {searchFields?.length ? (
+        <Space wrap style={{ marginBottom: 16 }}>
+          <Row gutter={20}>
+            {searchFields.map((f) => {
+              const key = String(f.field);
+              return (
+                <Col span={(24 / searchFields?.length) * 6 - 6}>
+                  <FormRender
+                    type="input"
+                    configs={{
+                      key: key,
+                      value: formData[key] ?? '',
+                      onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          [key]: e.target.value,
+                        })),
+                      allowClear: true,
+                      placeholder:
+                        f.placeholder ?? `搜索${f.label ?? String(f.field)}`,
+                      style: { width: f.width ?? 240 },
+                    }}
+                  />
+                </Col>
+              );
+            })}
+            <Col>
+              <Button onClick={() => setKeywords(formData)}>搜索</Button>
+            </Col>
+          </Row>
+        </Space>
+      ) : null}
       <Table<T>
         className={ComputedStyles}
         {...rest}
         columns={finalColumns}
-        dataSource={data}
+        dataSource={searchFields?.length ? filteredData : data}
       />
     </ConfigProvider>
   );
 }
 
-export type { CustomTableProps, TableActionItem } from './type';
+export type { CustomTableProps, SearchField, TableActionItem } from './type';

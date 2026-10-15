@@ -1,8 +1,8 @@
-import { useTableSearch } from '@/hooks/useTableSearch';
 import { getAllProducts } from '@/services/products';
 import type { TableColumnsType } from 'antd';
-import { Image, Input, Select, Space, Table, Tag } from 'antd';
+import { Image, Tag } from 'antd';
 import { useEffect, useState } from 'react';
+import { CustomTable } from 'shared';
 import type { ProductData } from './type';
 
 /** 从已加载数据里派生枚举列的筛选项（类目/形制是后端自由字符串，无固定字典） */
@@ -12,20 +12,8 @@ const deriveFilters = (list: ProductData[], field: 'category' | 'dynasty') =>
     value: v,
   }));
 
-// 搜索范围限定：选中的字段才参与关键词匹配
-const SEARCH_FIELDS: { label: string; value: keyof ProductData }[] = [
-  { label: '商品名称', value: 'name' },
-  { label: '类目', value: 'category' },
-  { label: '形制', value: 'dynasty' },
-];
-
 function ProductList() {
   const [products, setProducts] = useState<ProductData[]>([]);
-  const [searchField, setSearchField] = useState<keyof ProductData>('name');
-  // 关键词搜索（客户端过滤），范围由 searchField 限定
-  const { keyword, setKeyword, filtered } = useTableSearch(products, [
-    searchField,
-  ]);
 
   // 短内容列定宽防止加载/筛选时列宽跳动；
   // 标注 TableColumnsType 后 onFilter/render 的参数自动获得类型
@@ -105,34 +93,19 @@ function ProductList() {
     setProducts(res?.data ?? []);
   };
 
-  // 切换搜索范围时清空关键词，避免旧词在新字段下显示为空造成困惑
-  const onFieldChange = (field: keyof ProductData) => {
-    setSearchField(field);
-    setKeyword('');
-  };
-
   return (
     <div>
-      <Space.Compact style={{ width: 320, marginBottom: 16 }}>
-        <Select
-          value={searchField}
-          onChange={onFieldChange}
-          options={SEARCH_FIELDS}
-          style={{ width: 100 }}
-        />
-        <Input.Search
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          allowClear
-          placeholder={`搜索${
-            SEARCH_FIELDS.find((f) => f.value === searchField)?.label ?? ''
-          }`}
-        />
-      </Space.Compact>
-      <Table
+      <CustomTable
+        bordered
         rowKey="id"
         columns={columns}
-        dataSource={filtered}
+        data={products}
+        // 平铺搜索区：每字段一个独立搜索框（多框 AND，客户端过滤）
+        searchFields={[
+          { field: 'name', label: '商品名称' },
+          { field: 'category', label: '类目' },
+          { field: 'dynasty', label: '形制' },
+        ]}
         scroll={{ x: 'max-content' }}
       />
     </div>

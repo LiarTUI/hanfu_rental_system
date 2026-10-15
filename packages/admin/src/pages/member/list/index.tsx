@@ -1,16 +1,10 @@
-import { useTableSearch } from '@/hooks/useTableSearch';
 import { getAllUsers } from '@/services/users';
 import { UserOutlined } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
-import { Avatar, Input, Select, Space, Table, Tag } from 'antd';
+import { Avatar, Space, Tag } from 'antd';
 import { useEffect, useState } from 'react';
+import { CustomTable } from 'shared';
 import type { UserData } from './type';
-
-// 搜索范围限定：选中的字段才参与关键词匹配
-const SEARCH_FIELDS: { label: string; value: keyof UserData }[] = [
-  { label: '用户名', value: 'username' },
-  { label: '手机号', value: 'phone' },
-];
 
 /** 信用分 → 颜色（芝麻分式 350~950，越高越好） */
 const creditColor = (v: number) =>
@@ -18,11 +12,6 @@ const creditColor = (v: number) =>
 
 export default function MemberList() {
   const [members, setMembers] = useState<UserData[]>([]);
-  const [searchField, setSearchField] = useState<keyof UserData>('username');
-  // 关键词搜索（客户端过滤），范围由 searchField 限定；无枚举字段不加列筛选
-  const { keyword, setKeyword, filtered } = useTableSearch(members, [
-    searchField,
-  ]);
 
   const columns: TableColumnsType<UserData> = [
     {
@@ -88,34 +77,18 @@ export default function MemberList() {
     setMembers(res?.data ?? []);
   };
 
-  // 切换搜索范围时清空关键词，避免旧词在新字段下显示为空造成困惑
-  const onFieldChange = (field: keyof UserData) => {
-    setSearchField(field);
-    setKeyword('');
-  };
-
   return (
     <div>
-      <Space.Compact style={{ width: 300, marginBottom: 16 }}>
-        <Select
-          value={searchField}
-          onChange={onFieldChange}
-          options={SEARCH_FIELDS}
-          style={{ width: 90 }}
-        />
-        <Input.Search
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          allowClear
-          placeholder={`搜索${
-            SEARCH_FIELDS.find((f) => f.value === searchField)?.label ?? ''
-          }`}
-        />
-      </Space.Compact>
-      <Table
+      <CustomTable
+        bordered
         rowKey="userId"
         columns={columns}
-        dataSource={filtered}
+        data={members}
+        // 平铺搜索区：每字段一个独立搜索框（多框 AND，客户端过滤）
+        searchFields={[
+          { field: 'username', label: '用户名' },
+          { field: 'phone', label: '手机号' },
+        ]}
         scroll={{ x: 'max-content' }}
       />
     </div>

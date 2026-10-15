@@ -1,25 +1,13 @@
-import { useTableSearch } from '@/hooks/useTableSearch';
 import { getAllOrders } from '@/services/orders';
 import type { TableColumnsType } from 'antd';
-import { Input, Select, Space, Tag } from 'antd';
+import { Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import { CustomTable } from 'shared';
 import styles from './index.less';
 import { ORDER_STATUS, type OrderData } from './type';
-// 搜索范围限定：选中的字段才参与关键词匹配
-const SEARCH_FIELDS: { label: string; value: keyof OrderData }[] = [
-  { label: '订单号', value: 'orderNo' },
-  { label: '用户ID', value: 'userId' },
-  { label: '店铺ID', value: 'storeId' },
-];
 
 function List() {
   const [orders, setOrders] = useState<OrderData[]>([]);
-  const [searchField, setSearchField] = useState<keyof OrderData>('orderNo');
-  // 关键词搜索（客户端过滤），范围由 searchField 限定
-  const { keyword, setKeyword, filtered } = useTableSearch(orders, [
-    searchField,
-  ]);
 
   // 短内容列定宽防止加载/筛选时列宽跳动；
   // 标注 TableColumnsType 后 onFilter/render 的参数自动获得类型
@@ -101,36 +89,20 @@ function List() {
     setOrders(res?.data ?? []);
   };
 
-  // 切换搜索范围时清空关键词，避免旧词在新字段下显示为空造成困惑
-  const onFieldChange = (field: keyof OrderData) => {
-    setSearchField(field);
-    setKeyword('');
-  };
-
   return (
     <div>
-      <Space.Compact style={{ width: 300, marginBottom: 16 }}>
-        <Select
-          value={searchField}
-          onChange={onFieldChange}
-          options={SEARCH_FIELDS}
-          style={{ width: 90 }}
-        />
-        <Input.Search
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          allowClear
-          placeholder={`搜索${
-            SEARCH_FIELDS.find((f) => f.value === searchField)?.label ?? ''
-          }`}
-        />
-      </Space.Compact>
       <div className={styles.tableContainer}>
         <CustomTable
           bordered
           rowKey="id"
           columns={columns}
-          data={filtered}
+          data={orders}
+          // 平铺搜索区：每字段一个独立搜索框（多框 AND，客户端过滤）
+          searchFields={[
+            { field: 'orderNo', label: '订单号' },
+            { field: 'userId', label: '用户ID' },
+            { field: 'storeId', label: '店铺ID' },
+          ]}
           // 操作列：详情（全状态）、发货（仅待发货）、关闭（危险+确认）
           // 后端修改类接口就绪前先占位，onClick 里接真实请求
           actions={[

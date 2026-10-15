@@ -1,7 +1,6 @@
-import { useTableSearch } from '@/hooks/useTableSearch';
 import { getAllProducts, getSkus } from '@/services/products';
 import type { TableColumnsType } from 'antd';
-import { Input, Tag } from 'antd';
+import { Tag } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { CustomTable } from 'shared';
 import type { ProductData } from '../../list/type';
@@ -11,9 +10,6 @@ export default function ProductSku() {
   const [skus, setSkus] = useState<SkuData[]>([]);
   const [products, setProducts] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // 只搜 SKU 编码一个字段，无需范围下拉
-  const { keyword, setKeyword, filtered } = useTableSearch(skus, ['skuCode']);
 
   // productId → 商品名：列表里不展示裸 ID
   const productNameMap = useMemo(() => {
@@ -97,19 +93,13 @@ export default function ProductSku() {
 
   return (
     <div>
-      <Input.Search
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        allowClear
-        placeholder="搜索SKU编码"
-        style={{ width: 300, marginBottom: 16 }}
-      />
       <CustomTable
         bordered
         rowKey="id"
         loading={loading}
         columns={columns}
-        data={filtered}
+        data={skus}
+        searchFields={[{ field: 'skuCode', label: 'SKU编码' }]}
         scroll={{ x: 'max-content' }}
       />
     </div>
