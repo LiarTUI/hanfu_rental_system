@@ -4,10 +4,22 @@ import { register } from '../../../services/auth';
 import type { formData } from '../type';
 
 interface RegisterFormProps {
+  /** 点击"返回登录"时的回调（Modal 场景切换回登录 tab，整页场景切回登录 tab） */
   onBackLogin: () => void;
+  /**
+   * 注册成功回调。后端注册接口直接返回 token，注册成功即登录态
+   * （token 已存入 localStorage），回调后无需再回登录框。
+   */
+  onRegisterSuccess?: (data: any) => void;
+  /** token 存储的 localStorage key，注册自动登录时使用 */
+  tokenKey?: string;
 }
 
-function RegisterForm({ onBackLogin }: RegisterFormProps) {
+function RegisterForm({
+  onBackLogin,
+  onRegisterSuccess,
+  tokenKey = 'token',
+}: RegisterFormProps) {
   const [loading, setLoading] = useState(false);
 
   const onRegister = async (values: formData) => {
@@ -17,7 +29,15 @@ function RegisterForm({ onBackLogin }: RegisterFormProps) {
       const { surePassword, ...params } = values;
       const res = await register(params);
       if (res.success) {
+        // 后端注册返回 token：直接进入登录态，无需再登录
+        if (res.data?.token && tokenKey) {
+          localStorage.setItem(tokenKey, res.data.token);
+          message.success('注册成功，已自动登录！');
+          onRegisterSuccess?.(res.data);
+          return;
+        }
         message.success('注册成功！');
+        onRegisterSuccess?.(res.data);
         onBackLogin();
       }
     } catch (e) {

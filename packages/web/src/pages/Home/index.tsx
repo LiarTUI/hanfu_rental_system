@@ -1,10 +1,9 @@
 import { useNavigate } from '@@/exports';
 import { UserOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
-import { Avatar, ConfigProvider, Layout, message, Tabs } from 'antd';
-import { useEffect, useState } from 'react';
-import { IconFont } from 'shared';
-import { getProfile } from '../../services/user';
+import { Avatar, ConfigProvider, Layout, Tabs } from 'antd';
+import { useState } from 'react';
+import { IconFont, useAuth } from 'shared';
 import Home from './components/home';
 import KnowLedge from './components/knowLedge';
 import Mall from './components/mall';
@@ -19,20 +18,9 @@ const tabs = [
 function Index() {
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = useState('1');
-  const [avatarAddress, setAvatarAddress] = useState();
-  useEffect(() => {
-    getUserData();
-  }, []);
-  const getUserData = async () => {
-    try {
-      const res = await getProfile();
-      // 用户信息嵌在后端响应的 data 字段里
-      if (res.success) setAvatarAddress(res.data?.avatar);
-      else message.error('服务器异常');
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  // 登录态与头像来自全局 AuthProvider，页面不再自拉 profile
+  const { isLogin, user, openLogin } = useAuth();
+  const avatarAddress = user?.avatar;
   const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => {
     return (
       <div className={styles.tab}>
@@ -46,6 +34,17 @@ function Index() {
   ) => {
     e?.stopPropagation();
     navigate(`/${key}`, { replace: true });
+  };
+  // 头像/个人中心入口：游客先弹登录 Modal，登录成功后继续跳个人中心
+  const handleUserClick = (
+    e?: React.MouseEvent<HTMLElement | SVGSVGElement>,
+  ) => {
+    e?.stopPropagation();
+    if (!isLogin) {
+      openLogin({ after: () => navigate('/personalCenter') });
+      return;
+    }
+    navigate('/personalCenter', { replace: true });
   };
   return (
     <ConfigProvider
@@ -87,7 +86,7 @@ function Index() {
             size={26}
           ></IconFont>
           <Avatar
-            onClick={(e) => handleClick(e, 'personalCenter')}
+            onClick={handleUserClick}
             className={styles.avatar}
             src={avatarAddress}
             icon={avatarAddress ? '' : <UserOutlined />}

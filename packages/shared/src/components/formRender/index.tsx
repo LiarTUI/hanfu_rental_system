@@ -1,3 +1,4 @@
+import { Select } from 'antd';
 import { getTextRenderWidth } from '../../util/measure';
 import Input from '../Input';
 import styles from './index.less';
@@ -21,6 +22,8 @@ export default function FormRender(props: fromRenderProps) {
   const formItem = () => {
     if (type === 'input') {
       return <Input {...configs} />;
+    } else if (type === 'select') {
+      return <Select {...configs} />;
     }
   };
   return (

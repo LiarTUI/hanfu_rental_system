@@ -2,8 +2,8 @@ import { UserOutlined } from '@ant-design/icons';
 import { useNavigate } from '@umijs/max';
 import { Avatar, Layout, message, Modal, Upload } from 'antd';
 import { useEffect, useState } from 'react';
-import { IconFont } from 'shared';
-import { getProfile, uploadAvatar } from '../../services/user';
+import { IconFont, useAuth } from 'shared';
+import { uploadAvatar } from '../../services/user';
 import styles from './index.less';
 const { Header, Sider, Content } = Layout;
 // ========== 左侧菜单 ==========
@@ -94,44 +94,27 @@ const contractList: ContractItem[] = [
 
 function PersonalCenter() {
   const navigate = useNavigate();
+  // 登录态来自全局 AuthProvider；页面只管渲染与头像上传
+  const { isLogin, user, openLogin, logout, refreshUser } = useAuth();
   const [activeMenu, setActiveMenu] = useState('contract');
   const [activeStatus, setActiveStatus] = useState('inProgress');
-  const [userInfo, setUserInfo] = useState<{
-    username: string;
-    avatar: string;
-    data: any;
-  }>({
-    username: '',
-    avatar: '',
-    data: [],
-  });
   // 更换头像弹层
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState('');
 
+  // 游客直接敲 URL 进来：弹登录 Modal（登录成功后本页数据随登录态刷新）
   useEffect(() => {
-    getUserData();
+    if (!isLogin) {
+      openLogin();
+    }
+    // isLogin 变化不需要重复弹：弹窗由 AuthProvider 全局持有开关
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getUserData = async () => {
-    try {
-      const res = await getProfile();
-      if (res.success) {
-        setUserInfo({
-          username: res.username ?? '',
-          avatar: res.avatar ?? '',
-          data: res.data ?? [],
-        });
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   const handleExit = () => {
-    localStorage.removeItem('token');
-    navigate('/', { replace: true });
+    logout();
+    navigate('/home', { replace: true });
   };
 
   // 选文件后只做本地预览，return false 阻止 antd 自动上传，确认时才手动提交
@@ -161,7 +144,8 @@ function PersonalCenter() {
         setAvatarOpen(false);
         setAvatarFile(null);
         setPreviewUrl('');
-        getUserData(); // 重新拉取，左栏与顶部导航头像一起刷新
+        // 刷新全局用户信息，左栏与顶部导航头像一起更新
+        refreshUser();
       } else {
         message.error(res.errorMsg ?? '上传失败');
       }
@@ -206,14 +190,14 @@ function PersonalCenter() {
             >
               <Avatar
                 className={styles.avatar}
-                src={userInfo.avatar}
-                icon={userInfo.avatar ? '' : <UserOutlined />}
+                src={user?.avatar}
+                icon={user?.avatar ? '' : <UserOutlined />}
               />
               <span className={styles.avatarMask}>更换</span>
             </div>
             <div>
               <p className={styles.userName}>
-                {userInfo.username || '暂未登录'}
+                {user?.username || (isLogin ? '已登录' : '暂未登录')}
               </p>
               {/* TODO: 会员身份标签，后续接接口 */}
               <p className={styles.userTag}>云裳雅客</p>

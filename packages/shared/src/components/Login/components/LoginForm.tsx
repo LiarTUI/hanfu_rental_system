@@ -5,11 +5,14 @@ import type { formData } from '../type';
 
 interface LoginFormProps {
   role: 'user' | 'admin';
-  /** 登录成功 / 已登录时跳转的地址 */
-  homePath: string;
+  /**
+   * 整页登录模式专用：登录成功跳转的地址。
+   * 不传（Modal 场景）则只存 token + 回调 onLoginSuccess，不做任何跳转。
+   */
+  homePath?: string;
   /** token 存储的 localStorage key，同域部署时 web/admin 隔离用 */
   tokenKey?: string;
-  /** 登录成功后的额外副作用，如 admin 端存 adminName/storeid */
+  /** 登录成功后的回调（token 已存入 localStorage），data 为接口返回的 data */
   onLoginSuccess?: (data: any) => void;
 }
 
@@ -29,9 +32,11 @@ function LoginForm({
         message.success('登录成功！');
         localStorage.setItem(tokenKey, res.data.token);
         onLoginSuccess?.(res.data);
-        // 整页跳转而非 SPA navigate：admin 的菜单/初始状态在 getInitialState
-        // 里拉取，不整页刷新会停留在空菜单的后台
-        window.location.href = homePath;
+        // 整页模式才整页跳转而非 SPA navigate：
+        // admin 的菜单/初始状态在 getInitialState 里拉取，不整页刷新会停留在空菜单的后台
+        if (homePath) {
+          window.location.href = homePath;
+        }
         return;
       }
       message.error(res.errorMsg);
@@ -42,9 +47,9 @@ function LoginForm({
     }
   };
 
-  // 已登录直接进主页
+  // 整页模式的兜底：已登录直接进主页（Modal 场景由 AuthProvider 控制开关，不需要）
   useEffect(() => {
-    if (localStorage.getItem(tokenKey)) {
+    if (homePath && localStorage.getItem(tokenKey)) {
       window.location.href = homePath;
     }
   }, [homePath, tokenKey]);

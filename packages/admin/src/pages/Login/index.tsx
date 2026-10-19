@@ -13,10 +13,11 @@ function Login() {
         if (data.username) {
           localStorage.setItem('adminName', data.username);
         }
-        // storeid：平台管理员为 0/缺省，商家为店铺 id，
+        // storeId：平台管理员为 0/缺省，商家为店铺 id，
         // Dashboard 按它决定显示 Admin 视图还是 Store 视图
-        if (data.storeid !== undefined && data.storeid !== null) {
-          localStorage.setItem('storeid', String(data.storeid));
+        // （后端字段为驼峰 storeId，见 /admin/login 响应 data）
+        if (data.storeId !== undefined && data.storeId !== null) {
+          localStorage.setItem('storeid', String(data.storeId));
         }
       }}
     />

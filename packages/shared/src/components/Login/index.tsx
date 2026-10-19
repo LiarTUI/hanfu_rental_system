@@ -98,7 +98,14 @@ function LoginPage({
               />
             )}
             {type === 'register' && (
-              <RegisterForm onBackLogin={() => setType(roles[0])} />
+              <RegisterForm
+                onBackLogin={() => setType(roles[0])}
+                tokenKey={tokenKey}
+                // 后端注册直接返回 token：注册成功即登录态，直接进首页
+                onRegisterSuccess={() => {
+                  window.location.href = homePath;
+                }}
+              />
             )}
 
             {showRegister && type !== 'register' && (
@@ -127,3 +134,7 @@ function LoginPage({
 
 export { LoginPage };
 export type { LoginPageProps, LoginRole };
+// Modal 场景（web 游客模式登录入口）与整页版共用同一套表单
+export { default as LoginForm } from './components/LoginForm';
+export { LoginModal } from './LoginModal';
+export type { LoginModalProps } from './LoginModal';

@@ -12,7 +12,7 @@ export default defineConfig({
   routes: [
     {
       path: '/',
-      component: '@/pages/Login',
+      redirect: '/home',
     },
     {
       path: '/home',

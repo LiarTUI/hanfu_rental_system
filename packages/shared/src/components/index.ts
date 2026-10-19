@@ -1,3 +1,4 @@
+export * from './AuthProvider';
 export { default as CustomTable } from './CustomTable';
 export type {
   CustomTableProps,
