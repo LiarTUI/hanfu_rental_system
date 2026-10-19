@@ -1,3 +1,4 @@
+import { useNavigate } from '@@/exports';
 import { CalendarOutlined } from '@ant-design/icons';
 import { DatePicker, Select } from 'antd';
 import type { Dayjs } from 'dayjs';
@@ -100,7 +101,7 @@ function Mall({ setActiveKey }: MallProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const hasRange = !!(range?.[0] && range?.[1]);
-
+  const navigate = useNavigate();
   // 形制筛选项从商品数据里动态提取，数据更新后选项自动跟着变
   const styleOptions = useMemo(
     () => [
@@ -201,6 +202,7 @@ function Mall({ setActiveKey }: MallProps) {
         <div className={styles.goodsGrid}>
           {visibleList.map((item) => (
             <div
+              onClick={() => navigate(`/buy/${item.id}`)}
               key={item.id}
               className={`${styles.goodsCard} ${
                 item.soldOut ? styles.cardSoldOut : ''

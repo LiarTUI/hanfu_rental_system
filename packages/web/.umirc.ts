@@ -22,6 +22,10 @@ export default defineConfig({
       path: '/personalCenter',
       component: '@/pages/PersonalCenter',
     },
+    {
+      path: '/buy/:id',
+      component: '@/pages/Buy',
+    },
   ],
   npmClient: 'pnpm',
   utoopack: {},

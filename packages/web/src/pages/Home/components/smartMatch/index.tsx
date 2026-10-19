@@ -2,7 +2,7 @@ import { CalendarOutlined } from '@ant-design/icons';
 import { DatePicker, message } from 'antd';
 import type { Dayjs } from 'dayjs';
 import { useState } from 'react';
-import { IconFont } from 'shared';
+import { IconFont, useAuth } from 'shared';
 import styles from './index.less';
 
 const { RangePicker } = DatePicker;
@@ -65,9 +65,14 @@ function SmartMatch({ setActiveKey }: SmartMatchProps) {
   const [range, setRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
 
+  const { isLogin, openLogin } = useAuth();
   const pickScene = (id: string) => {
-    setScene(id);
-    setStep(2);
+    if (!isLogin) {
+      openLogin();
+    } else {
+      setScene(id);
+      setStep(2);
+    }
   };
 
   const pickStyle = (id: string) => {

@@ -40,10 +40,16 @@ function LoginModal({
       onCancel={onClose}
       footer={null}
       width={400}
-      destroyOnClose
       title={
-        <div style={{ textAlign: 'center', fontSize: 16, fontWeight: 600 }}>
-          {tab === 'login' ? '欢迎回来' : '注册账号'}
+        <div
+          style={{
+            textAlign: 'center',
+            fontSize: 16,
+            fontWeight: 600,
+            marginBottom: '12px',
+          }}
+        >
+          {tab === 'login' ? '还未登录，请先登录账号' : '注册账号'}
         </div>
       }
     >
