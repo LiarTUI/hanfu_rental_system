@@ -1,50 +1,129 @@
-.col {
-  transition: flex-basis 0.3s ease, max-width 0.3s ease;
-}
-
-.headerCard {
-  position: relative;
-  height: 120px;
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+// ========== 标题区:问候 + 日期 + 更新时间 ==========
+.dashHeader {
   display: flex;
-  align-items: center;
-  padding: 20px;
-  background-color: #fff;
-
-  .info {
-    margin-left: auto;
-    min-width: 90px;
-    text-align: center;
-
-    span {
-      display: block;
-      letter-spacing: 2px;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  .greetContanier {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    .greet {
+      margin: 0;
+      font-size: 20px;
       font-weight: 700;
-
-      &:nth-child(1) {
-        color: rgba(0, 0, 0, 0.45);
-        font-family: 'Helvetica Neue';
-        font-size: 16px;
-        line-height: 18px;
-      }
-
-      &:nth-child(2) {
-        margin-top: 16px;
-        text-align: center;
-        font-size: 20px;
-        line-height: 23px;
-        color: rgb(61, 61, 61);
-      }
+      letter-spacing: 1px;
+      color: rgba(0, 0, 0, 0.85);
     }
   }
 
-  .icon {
-    position: absolute;
-    fill: black;
+  .dateLine {
+    margin: 6px 0 0;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: rgba(0, 0, 0, 0.45);
+  }
+
+  .updated {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.35);
   }
 }
 
+// ========== 顶部统计卡:色条 + 图标块 + 数字 + 趋势副标 ==========
+.headerCard {
+  height: 96px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  .colorBar {
+    flex-shrink: 0;
+    height: 3px;
+  }
+
+  .cardBody {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 14px;
+    min-width: 0;
+  }
+
+  .iconBlock {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+
+  .cardInfo {
+    min-width: 0;
+  }
+
+  .cardLabel {
+    display: block;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    color: rgba(0, 0, 0, 0.45);
+  }
+
+  .cardValue {
+    margin-top: 2px;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 26px;
+    color: rgba(0, 0, 0, 0.85);
+
+    i {
+      margin-right: 1px;
+      font-style: normal;
+      font-size: 14px;
+      font-weight: 600;
+    }
+  }
+
+  .trend {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .t_up {
+    color: #52c41a;
+  }
+
+  .t_down {
+    color: #ff4d4f;
+  }
+
+  .t_flat {
+    color: rgba(0, 0, 0, 0.35);
+  }
+
+  .t_warn {
+    color: #ff4d4f;
+    font-weight: 600;
+  }
+
+  .t_none {
+    color: rgba(0, 0, 0, 0.25);
+  }
+}
+
+// ========== 图表区 ==========
 .chartRow {
   .smallEcharts {
     background-color: #fff;

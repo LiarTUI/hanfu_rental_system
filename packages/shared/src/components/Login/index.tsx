@@ -56,28 +56,6 @@ function LoginPage({
               >
                 <span>注册</span>
               </div>
-              {roles.includes('user') && (
-                <div
-                  className={`${styles.loginTab} ${
-                    type === 'user' ? styles.loginTabActive : ''
-                  }`}
-                  style={{ display: type === 'register' ? 'none' : '' }}
-                  onClick={() => setType('user')}
-                >
-                  <span>用户登陆</span>
-                </div>
-              )}
-              {roles.includes('admin') && (
-                <div
-                  className={`${styles.loginTab} ${
-                    type === 'admin' ? styles.loginTabActive : ''
-                  }`}
-                  style={{ display: type === 'register' ? 'none' : '' }}
-                  onClick={() => setType('admin')}
-                >
-                  <span>管理员/商家登陆</span>
-                </div>
-              )}
             </div>
 
             {/* 不同身份不同组件，切换时 React 销毁重建，表单数据天然隔离，无残留 */}
