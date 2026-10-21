@@ -1,0 +1,176 @@
+// ===== 通用空态 =====
+.emptyTip {
+  padding: 40px 0;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.25);
+}
+
+// ===== 分布横条 =====
+.distBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+
+  .distName {
+    flex-shrink: 0;
+    width: 60px;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
+  }
+
+  .distTrack {
+    flex: 1;
+    height: 10px;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+
+    .distFill {
+      display: block;
+      height: 100%;
+      border-radius: 5px;
+      transition: width 0.4s ease;
+    }
+  }
+
+  .distNum {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.4);
+
+    b {
+      color: rgba(0, 0, 0, 0.85);
+      font-size: 13px;
+    }
+  }
+}
+
+// ===== 待办与预警 =====
+.todoRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 2px;
+  cursor: pointer;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  }
+
+  .dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .todoLabel {
+    flex: 1;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.75);
+  }
+
+  .todoCount {
+    font-size: 16px;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.85);
+  }
+
+  .todoArrow {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.15);
+  }
+
+  &:hover .todoArrow {
+    color: #3066b6;
+  }
+
+  &.zero {
+    .todoLabel,
+    .todoCount {
+      color: rgba(0, 0, 0, 0.25);
+    }
+  }
+}
+
+// ===== 热租 Top5 =====
+.hotRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 2px;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  }
+
+  .rank {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  .r0 {
+    background: #f5a623;
+  }
+
+  .r1 {
+    background: #adb3ba;
+  }
+
+  .r2 {
+    background: #d78b57;
+  }
+
+  .hotInfo {
+    flex: 1;
+    min-width: 0;
+
+    .hotName {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.85);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hotSub {
+      margin-top: 2px;
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.4);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .rentCount {
+    flex-shrink: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #3066b6;
+
+    i {
+      margin-left: 2px;
+      font-style: normal;
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(0, 0, 0, 0.4);
+    }
+  }
+}
