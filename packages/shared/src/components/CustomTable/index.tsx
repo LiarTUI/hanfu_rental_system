@@ -17,6 +17,13 @@ import type { CustomTableProps, TableActionItem } from './type';
 const MAX_INLINE = 3;
 
 /** 单个操作按钮：有 confirm 则按钮本身不触发，由 Popconfirm 确认后执行，避免双触发 */
+
+function getActionLabel<T extends object>(
+  item: TableActionItem<T>,
+  record: T,
+): React.ReactNode {
+  return typeof item.label === 'function' ? item.label(record) : item.label;
+}
 function ActionButton<T extends object>({
   item,
   record,
@@ -25,6 +32,7 @@ function ActionButton<T extends object>({
   record: T;
 }) {
   const handle = () => item.onClick?.(record);
+  const label = getActionLabel(item, record);
   const btn = (
     <Button
       type="link"
@@ -33,7 +41,7 @@ function ActionButton<T extends object>({
       loading={item.loading?.(record) ?? false}
       onClick={item.confirm ? undefined : handle}
     >
-      {item.label}
+      {label}
     </Button>
   );
   return item.confirm ? (
@@ -72,7 +80,7 @@ function renderActions<T extends object>(
         menu={{
           items: more.map((it) => ({
             key: it.key,
-            label: it.label,
+            label: getActionLabel(it, record),
             danger: it.danger,
             disabled: it.loading?.(record),
           })),

@@ -8,7 +8,7 @@ export type TableActionItem<T> = {
   /** 唯一标识，作 React key 与折叠菜单 item key */
   key: string;
   /** 按钮文字 */
-  label: string;
+  label: string | ((record: T) => React.ReactNode);
   /** 危险操作，红色按钮 */
   danger?: boolean;
   /** 有值则点击先确认（平铺用 Popconfirm，菜单内用 Modal），确认后才执行 onClick */

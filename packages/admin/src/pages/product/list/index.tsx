@@ -107,6 +107,18 @@ function ProductList() {
           { field: 'dynasty', label: '形制' },
         ]}
         scroll={{ x: 'max-content' }}
+        actions={[
+          {
+            key: 'detail',
+            label: '查看',
+            onClick: (r) => console.log(r),
+          },
+          {
+            key: 'upAndDown', //上下架
+            label: (record) => (record.status === 0 ? '上架' : '下架'),
+            onClick: (r) => console.log(r),
+          },
+        ]}
       />
     </div>
   );
