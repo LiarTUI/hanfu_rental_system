@@ -1,14 +1,19 @@
 import { getAllOrders } from '@/services/orders';
 import type { TableColumnsType } from 'antd';
-import { Tag } from 'antd';
+import { Descriptions, Modal, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import { CustomTable } from 'shared';
 import styles from './index.less';
 import { ORDER_STATUS, type OrderData } from './type';
 
+// 金额统一两位小数；空值兜底为 -
+const fmtMoney = (v: number | null | undefined) =>
+  v == null ? '-' : `¥${v.toFixed(2)}`;
+
 function List() {
   const [orders, setOrders] = useState<OrderData[]>([]);
-
+  // 当前查看的订单；非空即弹窗打开
+  const [detailRecord, setDetailRecord] = useState<OrderData | null>(null);
   // 短内容列定宽防止加载/筛选时列宽跳动；
   // 标注 TableColumnsType 后 onFilter/render 的参数自动获得类型
   const columns: TableColumnsType<OrderData> = [
@@ -90,38 +95,86 @@ function List() {
   };
 
   return (
-    <div>
-      <div className={styles.tableContainer}>
-        <CustomTable
-          bordered
-          rowKey="id"
-          columns={columns}
-          data={orders}
-          // 平铺搜索区：每字段一个独立搜索框（多框 AND，客户端过滤）
-          searchFields={[
-            { field: 'orderNo', label: '订单号' },
-            { field: 'userId', label: '用户ID' },
-            { field: 'storeId', label: '店铺ID' },
-          ]}
-          // 操作列：详情（全状态）、发货（仅待发货）、关闭（危险+确认）
-          // 后端修改类接口就绪前先占位，onClick 里接真实请求
-          actions={[
-            {
-              key: 'detail',
-              label: '详情',
-              onClick: (r) => console.log('订单详情', r.id),
-            },
-            {
-              key: 'close',
-              label: '关闭',
-              danger: true,
-              confirm: '确定关闭该订单？',
-              onClick: (r) => console.log('关闭订单', r.id),
-            },
-          ]}
-          scroll={{ x: 'max-content' }}
-        />
-      </div>
+    <div className={styles.tableContainer}>
+      <CustomTable
+        bordered
+        rowKey="id"
+        columns={columns}
+        data={orders}
+        // 平铺搜索区：每字段一个独立搜索框（多框 AND，客户端过滤）
+        searchFields={[
+          { field: 'orderNo', label: '订单号' },
+          { field: 'userId', label: '用户ID' },
+          { field: 'storeId', label: '店铺ID' },
+        ]}
+        // 操作列：详情（全状态）、关闭（危险+确认）；发货已移交商家端
+        // 后端修改类接口就绪前先占位，onClick 里接真实请求
+        actions={[
+          {
+            key: 'detail',
+            label: '查看',
+            onClick: (r) => setDetailRecord(r),
+          },
+        ]}
+        scroll={{ x: 'max-content' }}
+      />
+      <Modal
+        title={`订单详情 ${detailRecord?.orderNo ?? ''}`}
+        open={!!detailRecord}
+        width={560}
+        okText="关闭"
+        onOk={() => setDetailRecord(null)}
+        onCancel={() => setDetailRecord(null)}
+        cancelButtonProps={{ style: { display: 'none' } }}
+      >
+        {detailRecord && (
+          <Descriptions bordered size="small" column={2}>
+            <Descriptions.Item label="订单号" span={2}>
+              {detailRecord.orderNo}
+            </Descriptions.Item>
+            <Descriptions.Item label="订单状态">
+              {(() => {
+                const s = ORDER_STATUS[detailRecord.status];
+                return s ? (
+                  <Tag color={s.color}>{s.text}</Tag>
+                ) : (
+                  detailRecord.status
+                );
+              })()}
+            </Descriptions.Item>
+            <Descriptions.Item label="下单时间">
+              {detailRecord.createTime}
+            </Descriptions.Item>
+            <Descriptions.Item label="用户ID">
+              {detailRecord.userId}
+            </Descriptions.Item>
+            <Descriptions.Item label="店铺ID">
+              {detailRecord.storeId}
+            </Descriptions.Item>
+            <Descriptions.Item label="租赁档期" span={2}>
+              {detailRecord.rentStartDate} ~ {detailRecord.rentEndDate}
+            </Descriptions.Item>
+            <Descriptions.Item label="实付租金">
+              {fmtMoney(detailRecord.totalAmount)}
+            </Descriptions.Item>
+            <Descriptions.Item label="押金">
+              {fmtMoney(detailRecord.depositAmount)}
+            </Descriptions.Item>
+            <Descriptions.Item label="平台佣金">
+              {fmtMoney(detailRecord.platformCommission)}
+            </Descriptions.Item>
+            <Descriptions.Item label="商家入账">
+              {fmtMoney(detailRecord.merchantIncome)}
+            </Descriptions.Item>
+            <Descriptions.Item label="发货物流" span={2}>
+              {detailRecord.trackingNoSend ?? '待发货（由商家端处理）'}
+            </Descriptions.Item>
+            <Descriptions.Item label="归还物流" span={2}>
+              {detailRecord.trackingNoReturn ?? '暂无'}
+            </Descriptions.Item>
+          </Descriptions>
+        )}
+      </Modal>
     </div>
   );
 }

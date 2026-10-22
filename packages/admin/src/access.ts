@@ -17,5 +17,7 @@ export default (initialState: AdminInitialState) => {
     menuStore: has('/store'),
     menuProduct: has('/product'),
     menuOrder: has('/order'),
+    // 发货管理：仅商家角色账号由后端下发 /order/ship 路径，平台管理员不下发即隐藏
+    menuOrderShip: has('/order/ship'),
   };
 };

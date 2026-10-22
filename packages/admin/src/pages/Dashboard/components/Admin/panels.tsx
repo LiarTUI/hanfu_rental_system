@@ -98,13 +98,13 @@ export function TodoPanel() {
       key: 'pendingShipCount',
       label: '待发货订单',
       color: '#fa8c16',
-      path: '/order/ship',
+      path: '/order/list', // 发货由商家端处理，平台侧跳订单列表
     },
     {
       key: 'overdueReturnCount',
       label: '逾期归还',
       color: '#ff4d4f',
-      path: '/order/ship',
+      path: '/order/list',
     },
     {
       key: 'damagingCount',

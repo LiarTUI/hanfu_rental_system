@@ -43,9 +43,11 @@ export default defineConfig({
           name: '订单列表',
         },
         {
+          // 发货管理：仅商家角色可见（后端 menus 下发 /order/ship 才显示，见 access.ts）
           path: '/order/ship',
           component: '@/pages/order/ship',
           name: '发货管理',
+          access: 'menuOrderShip',
         },
       ],
     },
