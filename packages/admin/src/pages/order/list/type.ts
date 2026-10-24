@@ -29,3 +29,12 @@ export const ORDER_STATUS: Record<number, { text: string; color: string }> = {
   5: { text: '已完成', color: 'green' },
   6: { text: '已退款关闭', color: 'red' },
 };
+
+// 用户评价（订单详情弹窗内嵌展示；字段待后端确认，暂按通用评价结构）
+export type ReviewData = {
+  reviewId: number;
+  orderId: number;
+  rating: number; // 1~5 星
+  content: string | null; // 评价内容
+  createTime: string;
+};

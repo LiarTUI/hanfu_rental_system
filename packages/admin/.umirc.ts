@@ -87,11 +87,6 @@ export default defineConfig({
           component: '@/pages/member/list',
           name: '用户列表',
         },
-        {
-          path: '/member/review',
-          component: '@/pages/member/review',
-          name: '用户评价',
-        },
       ],
     },
     {

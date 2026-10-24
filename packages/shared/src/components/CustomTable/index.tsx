@@ -24,6 +24,12 @@ function getActionLabel<T extends object>(
 ): React.ReactNode {
   return typeof item.label === 'function' ? item.label(record) : item.label;
 }
+/** 危险标记/确认文案均支持按行动态求值 */
+const resolveDanger = (d: TableActionItem<any>['danger'], record: any) =>
+  typeof d === 'function' ? d(record) : d;
+const resolveConfirm = (c: TableActionItem<any>['confirm'], record: any) =>
+  typeof c === 'function' ? c(record) : c;
+
 function ActionButton<T extends object>({
   item,
   record,
@@ -33,19 +39,21 @@ function ActionButton<T extends object>({
 }) {
   const handle = () => item.onClick?.(record);
   const label = getActionLabel(item, record);
+  const isDanger = resolveDanger(item.danger, record);
+  const confirmText = resolveConfirm(item.confirm, record);
   const btn = (
     <Button
       type="link"
       size="small"
-      danger={item.danger}
+      danger={isDanger}
       loading={item.loading?.(record) ?? false}
-      onClick={item.confirm ? undefined : handle}
+      onClick={confirmText ? undefined : handle}
     >
       {label}
     </Button>
   );
-  return item.confirm ? (
-    <Popconfirm title={item.confirm} onConfirm={handle}>
+  return confirmText ? (
+    <Popconfirm title={confirmText} onConfirm={handle}>
       {btn}
     </Popconfirm>
   ) : (
@@ -81,17 +89,19 @@ function renderActions<T extends object>(
           items: more.map((it) => ({
             key: it.key,
             label: getActionLabel(it, record),
-            danger: it.danger,
+            danger: resolveDanger(it.danger, record),
             disabled: it.loading?.(record),
           })),
           onClick: ({ key }) => {
             const target = more.find((it) => it.key === key);
             if (!target) return;
+            const confirmText = resolveConfirm(target.confirm, record);
             // 菜单项没法包 Popconfirm，confirm 的用 Modal 兜底确认
-            if (target.confirm) {
+            if (confirmText) {
+              const isDanger = resolveDanger(target.danger, record);
               Modal.confirm({
-                title: target.confirm,
-                okButtonProps: { danger: target.danger },
+                title: confirmText,
+                okButtonProps: { danger: isDanger },
                 onOk: () => target.onClick?.(record),
               });
             } else {
@@ -121,6 +131,7 @@ export default function CustomTable<T extends object>({
   actions,
   columns,
   searchFields,
+  toolbar,
   shadow,
   ...rest
 }: CustomTableProps<T>) {
@@ -179,10 +190,11 @@ export default function CustomTable<T extends object>({
         },
       }}
     >
-      {/* 平铺搜索区：每字段一个独立搜索框，窄屏自动换行 */}
+      {/* 平铺搜索区：每字段一个独立搜索框，窄屏自动换行；
+          toolbar 渲染在同行最右（Space 需 display:flex 让 Row 撑满行宽） */}
       {searchFields?.length ? (
-        <Space wrap style={{ marginBottom: 16 }}>
-          <Row gutter={20}>
+        <Space wrap style={{ marginBottom: 16, display: 'flex' }}>
+          <Row gutter={20} style={{ flex: 1 }}>
             {searchFields.map((f) => {
               const key = String(f.field);
               return (
@@ -220,8 +232,15 @@ export default function CustomTable<T extends object>({
                 重置
               </Button>
             </Col>
+            {toolbar ? (
+              <Col flex="auto" style={{ textAlign: 'right' }}>
+                {toolbar}
+              </Col>
+            ) : null}
           </Row>
         </Space>
+      ) : toolbar ? (
+        <div style={{ marginBottom: 16, textAlign: 'right' }}>{toolbar}</div>
       ) : null}
       <Table<T>
         className={ComputedStyles}

@@ -1,77 +1,39 @@
+import { getMarketProducts } from '@/services/product';
 import { useNavigate } from '@@/exports';
 import { CalendarOutlined } from '@ant-design/icons';
-import { DatePicker, Select } from 'antd';
+import { DatePicker, Select, Spin } from 'antd';
 import type { Dayjs } from 'dayjs';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { IconFont } from 'shared';
 import styles from './index.less';
 
 const { RangePicker } = DatePicker;
 
-// ========== 商品数据 ==========
-// TODO: 以下为占位样例数据（名称/价格/分类/商家均照设计稿填的假数据），
-//       对接接口后整体替换为后端返回：
-//       - img 填本地 import 或接口 URL，为空时显示灰色占位块
-//       - heat 用于「按热度」排序，接口返回后填入
-//       - soldOut: true → 卡片灰化并显示「当前档期已约满」，选定租赁档期后该卡被滤除
-//       - featured: true → 左上角显示红色「镇店良裁」角标
+// ========== 商品数据（来自 GET /api/product/market） ==========
+// heat 后端暂未提供时由前端按 rating/reviewCount 折算兜底；
+// available=false → 卡片灰化并显示「当前档期已约满」，选定租赁档期后该卡被滤除
+// featured → 左上角显示红色「镇店良裁」角标
 interface GoodsItem {
   id: number;
   name: string;
-  price: number; // 日租金
-  heat: number; // 热度（排序用）
+  rentPrice: number; // 日租金
+  rentUnit?: number; // 租金单位，1=天
   dynasty: string; // 宋制 / 晋制 / 唐制 / 明制
   category: string; // 外搭 / 下装 / 男装 / 步摇...
-  shop: string; // 商家名
-  img: string;
-  soldOut?: boolean;
+  storeId: number;
+  storeName?: string; // 店铺名，接口暂未返回时显示「」占位
+  coverUrl?: string;
+  stock?: number;
+  rating?: number | null;
+  reviewCount?: number;
+  heat: number; // 热度（排序用）
+  available?: boolean; // 选定档期内是否可租（后端档期校验）
   featured?: boolean;
 }
 
-const goodsList: GoodsItem[] = [
-  {
-    id: 1,
-    name: '月白海棠刺绣对襟褙子',
-    price: 60,
-    heat: 98,
-    dynasty: '宋制',
-    category: '外搭',
-    shop: '织造司',
-    img: '',
-  },
-  {
-    id: 2,
-    name: '浅灰蓝三褶百迭裙',
-    price: 40,
-    heat: 85,
-    dynasty: '宋制',
-    category: '下装',
-    shop: '重回汉唐',
-    img: '',
-    soldOut: true,
-  },
-  {
-    id: 3,
-    name: '大红织金云龙纹圆领袍',
-    price: 120,
-    heat: 120,
-    dynasty: '明制',
-    category: '男装',
-    shop: '明华堂',
-    img: '',
-    featured: true,
-  },
-  {
-    id: 4,
-    name: '南珠流苏银錾步摇',
-    price: 25,
-    heat: 76,
-    dynasty: '配饰',
-    category: '步摇',
-    shop: '寻裳雅陌',
-    img: '',
-  },
-];
+/** 接口未提供 heat 时，用评分/评价数折算一个兜底热度 */
+const deriveHeat = (g: GoodsItem) =>
+  Math.round((g.rating ?? 0) * 20 + (g.reviewCount ?? 0));
 
 // ========== 断代筛选：match 对应商品数据的 dynasty 字段 ==========
 const dynastyTabs = [
@@ -99,19 +61,38 @@ function Mall({ setActiveKey }: MallProps) {
   const [sortType, setSortType] = useState('heat');
   const [range, setRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [goodsList, setGoodsList] = useState<GoodsItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const hasRange = !!(range?.[0] && range?.[1]);
   const navigate = useNavigate();
+
+  // 拉取市集商品：选定档期后带日期参数重拉，由后端校验各商品区间内可租状态
+  useEffect(() => {
+    setLoading(true);
+    getMarketProducts(
+      hasRange && range?.[0] && range?.[1]
+        ? {
+            startDate: range[0].format('YYYY-MM-DD'),
+            endDate: range[1].format('YYYY-MM-DD'),
+          }
+        : undefined,
+    )
+      .then((res) => setGoodsList(res?.data ?? []))
+      .finally(() => setLoading(false));
+    // range 变化即重拉；hasRange 由 range 派生不必单列
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [range]);
+
   // 形制筛选项从商品数据里动态提取，数据更新后选项自动跟着变
   const styleOptions = useMemo(
     () => [
       { value: 'all', label: '所有形制' },
-      ...Array.from(new Set(goodsList.map((g) => g.category))).map((c) => ({
-        value: c,
-        label: c,
-      })),
+      ...Array.from(new Set(goodsList.map((g) => g.category)))
+        .filter(Boolean)
+        .map((c) => ({ value: c, label: c })),
     ],
-    [],
+    [goodsList],
   );
 
   const visibleList = useMemo(() => {
@@ -119,15 +100,17 @@ function Mall({ setActiveKey }: MallProps) {
     let list = goodsList.filter((g) => {
       if (match && g.dynasty !== match) return false;
       if (styleFilter !== 'all' && g.category !== styleFilter) return false;
-      if (hasRange && g.soldOut) return false; // 选定档期后，滤除无库之衣
+      if (hasRange && g.available === false) return false; // 选定档期后，滤除无库之衣
       return true;
     });
+    if (sortType === 'heat')
+      list = [...list].sort((a, b) => deriveHeat(b) - deriveHeat(a));
     if (sortType === 'priceAsc')
-      list = [...list].sort((a, b) => a.price - b.price);
+      list = [...list].sort((a, b) => a.rentPrice - b.rentPrice);
     if (sortType === 'priceDesc')
-      list = [...list].sort((a, b) => b.price - a.price);
+      list = [...list].sort((a, b) => b.rentPrice - a.rentPrice);
     return list;
-  }, [dynastyKey, styleFilter, sortType, hasRange]);
+  }, [goodsList, dynastyKey, styleFilter, sortType, hasRange]);
 
   return (
     <div className={styles.mall}>
@@ -198,22 +181,25 @@ function Mall({ setActiveKey }: MallProps) {
       </div>
 
       {/* ========== 商品网格 ========== */}
-      {visibleList.length > 0 ? (
+      {loading ? (
+        <div className={styles.emptyBlock}>
+          <Spin />
+        </div>
+      ) : visibleList.length > 0 ? (
         <div className={styles.goodsGrid}>
           {visibleList.map((item) => (
             <div
               onClick={() => navigate(`/buy/${item.id}`)}
               key={item.id}
               className={`${styles.goodsCard} ${
-                item.soldOut ? styles.cardSoldOut : ''
+                item.available === false ? styles.cardSoldOut : ''
               }`}
             >
               <div className={styles.goodsImgBox}>
-                {/* TODO: img 为空显示占位块，拿到数据后填 goodsList 里的 img 字段即可 */}
-                {item.img ? (
+                {item.coverUrl ? (
                   <img
                     className={styles.goodsImg}
-                    src={item.img}
+                    src={item.coverUrl}
                     alt={item.name}
                   />
                 ) : (
@@ -222,7 +208,7 @@ function Mall({ setActiveKey }: MallProps) {
                 {item.featured && (
                   <span className={styles.featuredBadge}>镇店良裁</span>
                 )}
-                {item.soldOut && (
+                {item.available === false && (
                   <span className={styles.soldOutTag}>当前档期已约满</span>
                 )}
               </div>
@@ -231,13 +217,13 @@ function Mall({ setActiveKey }: MallProps) {
                 <div className={styles.priceBox}>
                   <p className={styles.price}>
                     <span>¥</span>
-                    {item.price}
+                    {item.rentPrice}
                   </p>
                   <span className={styles.per}>/ 日</span>
                 </div>
               </div>
               <p className={styles.goodsMeta}>
-                {item.dynasty} · {item.category}｜{item.shop}
+                {item.dynasty} · {item.category}｜{item.storeName ?? '暂无店铺'}
               </p>
             </div>
           ))}

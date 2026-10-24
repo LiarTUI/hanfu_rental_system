@@ -1,10 +1,10 @@
-import { getAllOrders } from '@/services/orders';
+import { getAllOrders, getReviewsByOrder } from '@/services/orders';
 import type { TableColumnsType } from 'antd';
-import { Descriptions, Modal, Tag } from 'antd';
+import { Descriptions, Modal, Rate, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import { CustomTable } from 'shared';
 import styles from './index.less';
-import { ORDER_STATUS, type OrderData } from './type';
+import { ORDER_STATUS, type OrderData, type ReviewData } from './type';
 
 // 金额统一两位小数；空值兜底为 -
 const fmtMoney = (v: number | null | undefined) =>
@@ -14,6 +14,9 @@ function List() {
   const [orders, setOrders] = useState<OrderData[]>([]);
   // 当前查看的订单；非空即弹窗打开
   const [detailRecord, setDetailRecord] = useState<OrderData | null>(null);
+  // 详情弹窗内的用户评价（原独立"用户评价"页面已并入此处）
+  const [reviews, setReviews] = useState<ReviewData[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
   // 短内容列定宽防止加载/筛选时列宽跳动；
   // 标注 TableColumnsType 后 onFilter/render 的参数自动获得类型
   const columns: TableColumnsType<OrderData> = [
@@ -40,6 +43,18 @@ function List() {
         const s = ORDER_STATUS[v];
         return s ? <Tag color={s.color}>{s.text}</Tag> : v;
       },
+    },
+    {
+      title: '用户ID',
+      dataIndex: 'userId',
+      key: 'userId',
+      width: 90,
+    },
+    {
+      title: '店铺ID',
+      dataIndex: 'storeId',
+      key: 'storeId',
+      width: 90,
     },
     {
       title: '下单时间',
@@ -82,11 +97,39 @@ function List() {
       width: 110,
       render: (v: number) => `¥${v.toFixed(2)}`,
     },
+    {
+      title: '发货物流',
+      dataIndex: 'trackingNoSend',
+      key: 'trackingNoSend',
+      width: 150,
+      ellipsis: true,
+      render: (v: string | null) => v ?? '—',
+    },
+    {
+      title: '归还物流',
+      dataIndex: 'trackingNoReturn',
+      key: 'trackingNoReturn',
+      width: 150,
+      ellipsis: true,
+      render: (v: string | null) => v ?? '—',
+    },
   ];
 
   useEffect(() => {
     initData();
   }, []);
+
+  // 打开详情弹窗时按订单拉取评价；关闭时清空，避免串单
+  useEffect(() => {
+    if (!detailRecord) {
+      setReviews([]);
+      return;
+    }
+    setReviewsLoading(true);
+    getReviewsByOrder(detailRecord.id)
+      .then((res) => setReviews(res?.data ?? []))
+      .finally(() => setReviewsLoading(false));
+  }, [detailRecord]);
 
   const initData = async () => {
     const res = await getAllOrders();
@@ -128,51 +171,83 @@ function List() {
         cancelButtonProps={{ style: { display: 'none' } }}
       >
         {detailRecord && (
-          <Descriptions bordered size="small" column={2}>
-            <Descriptions.Item label="订单号" span={2}>
-              {detailRecord.orderNo}
-            </Descriptions.Item>
-            <Descriptions.Item label="订单状态">
-              {(() => {
-                const s = ORDER_STATUS[detailRecord.status];
-                return s ? (
-                  <Tag color={s.color}>{s.text}</Tag>
-                ) : (
-                  detailRecord.status
-                );
-              })()}
-            </Descriptions.Item>
-            <Descriptions.Item label="下单时间">
-              {detailRecord.createTime}
-            </Descriptions.Item>
-            <Descriptions.Item label="用户ID">
-              {detailRecord.userId}
-            </Descriptions.Item>
-            <Descriptions.Item label="店铺ID">
-              {detailRecord.storeId}
-            </Descriptions.Item>
-            <Descriptions.Item label="租赁档期" span={2}>
-              {detailRecord.rentStartDate} ~ {detailRecord.rentEndDate}
-            </Descriptions.Item>
-            <Descriptions.Item label="实付租金">
-              {fmtMoney(detailRecord.totalAmount)}
-            </Descriptions.Item>
-            <Descriptions.Item label="押金">
-              {fmtMoney(detailRecord.depositAmount)}
-            </Descriptions.Item>
-            <Descriptions.Item label="平台佣金">
-              {fmtMoney(detailRecord.platformCommission)}
-            </Descriptions.Item>
-            <Descriptions.Item label="商家入账">
-              {fmtMoney(detailRecord.merchantIncome)}
-            </Descriptions.Item>
-            <Descriptions.Item label="发货物流" span={2}>
-              {detailRecord.trackingNoSend ?? '待发货（由商家端处理）'}
-            </Descriptions.Item>
-            <Descriptions.Item label="归还物流" span={2}>
-              {detailRecord.trackingNoReturn ?? '暂无'}
-            </Descriptions.Item>
-          </Descriptions>
+          <>
+            <Descriptions bordered size="small" column={2}>
+              <Descriptions.Item label="订单号" span={2}>
+                {detailRecord.orderNo}
+              </Descriptions.Item>
+              <Descriptions.Item label="订单状态">
+                {(() => {
+                  const s = ORDER_STATUS[detailRecord.status];
+                  return s ? (
+                    <Tag color={s.color}>{s.text}</Tag>
+                  ) : (
+                    detailRecord.status
+                  );
+                })()}
+              </Descriptions.Item>
+              <Descriptions.Item label="下单时间">
+                {detailRecord.createTime}
+              </Descriptions.Item>
+              <Descriptions.Item label="用户ID">
+                {detailRecord.userId}
+              </Descriptions.Item>
+              <Descriptions.Item label="店铺ID">
+                {detailRecord.storeId}
+              </Descriptions.Item>
+              <Descriptions.Item label="租赁档期" span={2}>
+                {detailRecord.rentStartDate} ~ {detailRecord.rentEndDate}
+              </Descriptions.Item>
+              <Descriptions.Item label="实付租金">
+                {fmtMoney(detailRecord.totalAmount)}
+              </Descriptions.Item>
+              <Descriptions.Item label="押金">
+                {fmtMoney(detailRecord.depositAmount)}
+              </Descriptions.Item>
+              <Descriptions.Item label="平台佣金">
+                {fmtMoney(detailRecord.platformCommission)}
+              </Descriptions.Item>
+              <Descriptions.Item label="商家入账">
+                {fmtMoney(detailRecord.merchantIncome)}
+              </Descriptions.Item>
+              <Descriptions.Item label="发货物流" span={2}>
+                {detailRecord.trackingNoSend ?? '—'}
+              </Descriptions.Item>
+              <Descriptions.Item label="归还物流" span={2}>
+                {detailRecord.trackingNoReturn ?? '—'}
+              </Descriptions.Item>
+            </Descriptions>
+            {/* 用户评价：原独立页面已并入详情，随订单实时拉取 */}
+            <div style={{ marginTop: 16 }}>
+              <div style={{ fontWeight: 600, marginBottom: 8 }}>用户评价</div>
+              {reviewsLoading ? (
+                <div style={{ color: '#999' }}>加载中…</div>
+              ) : reviews.length ? (
+                reviews.map((rv) => (
+                  <div
+                    key={rv.reviewId}
+                    style={{ padding: '8px 0', borderTop: '1px solid #f0f0f0' }}
+                  >
+                    <div
+                      style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                    >
+                      <Rate
+                        disabled
+                        value={rv.rating}
+                        style={{ fontSize: 14 }}
+                      />
+                      <span style={{ color: '#999', fontSize: 12 }}>
+                        {rv.createTime}
+                      </span>
+                    </div>
+                    <div style={{ marginTop: 4 }}>{rv.content || '—'}</div>
+                  </div>
+                ))
+              ) : (
+                <div style={{ color: '#999' }}>暂无评价</div>
+              )}
+            </div>
+          </>
         )}
       </Modal>
     </div>

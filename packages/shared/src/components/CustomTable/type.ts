@@ -9,10 +9,10 @@ export type TableActionItem<T> = {
   key: string;
   /** 按钮文字 */
   label: string | ((record: T) => React.ReactNode);
-  /** 危险操作，红色按钮 */
-  danger?: boolean;
-  /** 有值则点击先确认（平铺用 Popconfirm，菜单内用 Modal），确认后才执行 onClick */
-  confirm?: string;
+  /** 危险操作，红色按钮；传函数则按行判断 */
+  danger?: boolean | ((record: T) => boolean);
+  /** 有值则点击先确认（平铺用 Popconfirm，菜单内用 Modal），确认后才执行 onClick；传函数则按行生成文案 */
+  confirm?: string | ((record: T) => string);
   /** 返回 true 则该行不渲染此按钮 */
   hidden?: (record: T) => boolean;
   /** 该行此按钮的加载态（防重复提交） */
@@ -50,4 +50,6 @@ export type CustomTableProps<T> = TableProps<T> & {
   shadow?: boolean;
   /** 传入则表格上方平铺渲染搜索框并做客户端过滤；不传则不渲染搜索区 */
   searchFields?: SearchField<T>[];
+  /** 搜索区同行右侧的工具区（如"新建"按钮）；无搜索区时单独渲染在表格上方 */
+  toolbar?: React.ReactNode;
 };
