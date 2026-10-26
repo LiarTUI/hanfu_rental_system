@@ -1,29 +1,13 @@
+import { getMarketProducts, type MarketProduct } from '@/services/product';
+import { getScenes, type SceneItem } from '@/services/tag';
 import { useNavigate } from '@@/exports';
 import { Button } from 'antd';
+import { useEffect, useState } from 'react';
 import { IconFont } from 'shared';
 import styles from './index.less';
-// 图片后续接入方式：import scene1 from '../../assets/scene1.jpg'，然后把变量填进 img 字段
-const sceneList = [
-  {
-    dynasty: '宋制',
-    title: '拾秋 · 禅意写真',
-    desc: '追凉条修长，室内感自然风光适用。',
-    img: '',
-  },
-  {
-    dynasty: '明制',
-    title: '执手 · 传统婚宴',
-    desc: '端庄大方，适合敬酒、迎宾等正式礼仪。',
-    img: '',
-    red: true,
-  },
-  {
-    dynasty: '',
-    title: '烟火 · 城市游园',
-    desc: '轻慢修行，兼容现代生活工具与交通。',
-    img: '',
-  },
-];
+
+// 场景提案数据来自 GET /api/tag/scenes（id / name / imageUrl）
+// 接口暂无 desc / dynasty 推荐角标字段，卡片仅展示图与名称，后端补字段后可扩展
 
 // ========== 本周风物（知识板块）==========
 const knowledge = {
@@ -41,39 +25,6 @@ const knowledge = {
   ],
 };
 
-// ========== 档期良选（本周上新）==========
-// TODO: 后续对接接口后填充：img 填图片（本地 import 变量或后端 URL），name/price/category 同步替换
-const marketList = [
-  {
-    id: 1,
-    name: '月白海棠刺绣对襟褙子',
-    price: 60,
-    category: '宋制 · 外搭',
-    img: '',
-  },
-  {
-    id: 2,
-    name: '大红织金云龙纹圆领袍',
-    price: 120,
-    category: '明制 · 男装',
-    img: '',
-  },
-  {
-    id: 3,
-    name: '浅灰蓝三褶百迭裙',
-    price: 40,
-    category: '宋制 · 下装',
-    img: '',
-  },
-  {
-    id: 4,
-    name: '南珠流苏银錾步摇',
-    price: 25,
-    category: '配饰 · 步摇',
-    img: '',
-  },
-];
-
 const footerText = '© 2026 HUAJIN HANFU PLATFORM. 知识赋能的汉服租赁生态体系。';
 
 interface HomeProps {
@@ -83,6 +34,17 @@ interface HomeProps {
 
 function Home({ setActiveKey }: HomeProps) {
   const navigate = useNavigate();
+  const [sceneList, setSceneList] = useState<SceneItem[]>([]);
+  // 档期良选：复用市集商品接口，取前 4 件
+  const [marketList, setMarketList] = useState<MarketProduct[]>([]);
+
+  useEffect(() => {
+    getScenes().then((res) => setSceneList(res?.data ?? []));
+    getMarketProducts().then((res) =>
+      setMarketList((res?.data ?? []).slice(0, 4)),
+    );
+  }, []);
+
   return (
     <div className={styles.container}>
       {/* hero 层：独占一屏并保持原有居中效果 */}
@@ -120,29 +82,19 @@ function Home({ setActiveKey }: HomeProps) {
 
         <div className={styles.sceneList}>
           {sceneList.map((scene) => (
-            <div className={styles.sceneCard} key={scene.title}>
+            <div className={styles.sceneCard} key={scene.id}>
               <div className={styles.sceneImgBox}>
-                {scene.img ? (
+                {scene.imageUrl ? (
                   <img
                     className={styles.sceneImg}
-                    src={scene.img}
-                    alt={scene.title}
+                    src={scene.imageUrl}
+                    alt={scene.name}
                   />
                 ) : (
                   <div className={styles.sceneImgPlaceholder} />
                 )}
-                {scene.dynasty && (
-                  <div
-                    className={`${styles.sceneTag} ${
-                      scene.red ? styles.tagRed : ''
-                    }`}
-                  >
-                    {scene.dynasty} · 推荐
-                  </div>
-                )}
               </div>
-              <h3 className={styles.sceneName}>{scene.title}</h3>
-              <p className={styles.sceneDesc}>{scene.desc}</p>
+              <h3 className={styles.sceneName}>{scene.name}</h3>
               <a className={styles.sceneLink}>以此场景生成搭配</a>
             </div>
           ))}
@@ -196,18 +148,23 @@ function Home({ setActiveKey }: HomeProps) {
             <h2 className={styles.marketTitle}>档期良选</h2>
             <p className={styles.marketSubTitle}>AVAILABLE THIS WEEKEND</p>
           </div>
-          <a className={styles.marketMore}>进入市集 →</a>
+          <a className={styles.marketMore} onClick={() => setActiveKey('4')}>
+            进入市集 →
+          </a>
         </div>
 
         <div className={styles.marketList}>
           {marketList.map((item) => (
-            <div className={styles.marketCard} key={item.id}>
+            <div
+              className={styles.marketCard}
+              key={item.id}
+              onClick={() => navigate(`/buy/${item.id}`)}
+            >
               <div className={styles.marketImgBox}>
-                {/* TODO: img 为空显示占位块，拿到数据后填 marketList 里的 img 字段即可 */}
-                {item.img ? (
+                {item.coverUrl ? (
                   <img
                     className={styles.marketImg}
-                    src={item.img}
+                    src={item.coverUrl}
                     alt={item.name}
                   />
                 ) : (
@@ -216,9 +173,11 @@ function Home({ setActiveKey }: HomeProps) {
               </div>
               <div className={styles.marketRow}>
                 <p className={styles.marketName}>{item.name}</p>
-                <p className={styles.marketPrice}>¥{item.price}</p>
+                <p className={styles.marketPrice}>¥{item.rentPrice}</p>
               </div>
-              <p className={styles.marketCategory}>{item.category}</p>
+              <p className={styles.marketCategory}>
+                {item.dynasty} · {item.category}
+              </p>
             </div>
           ))}
         </div>

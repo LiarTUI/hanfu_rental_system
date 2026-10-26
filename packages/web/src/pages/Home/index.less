@@ -16,6 +16,24 @@
       }
     }
 
+    // 我的订单入口图标（与购物车并排，错开定位）
+    .ordersIcon {
+      position: absolute;
+      right: 180px;
+      top: 18px;
+      font-size: 22px;
+      color: rgb(42, 40, 37);
+      cursor: pointer;
+
+      &:hover {
+        color: rgb(142, 53, 46);
+      }
+
+      @media (max-width: 700px) {
+        display: none;
+      }
+    }
+
     .avatar {
       position: absolute;
       right: 80px;

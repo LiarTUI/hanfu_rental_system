@@ -1,0 +1,151 @@
+// 我的订单页：与 Buy 页同一古典纸色基调
+.orders {
+  min-height: 100vh;
+  background-color: rgb(243, 240, 233);
+  color: rgb(42, 40, 37);
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+
+  .backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #8a877f;
+    cursor: pointer;
+
+    &:hover {
+      color: rgb(142, 53, 46);
+    }
+  }
+
+  .pageTitle {
+    margin: 20px 0 4px;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 4px;
+  }
+
+  .pageSub {
+    margin: 0 0 28px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: #a5a29a;
+  }
+
+  .empty {
+    padding: 80px 0;
+    text-align: center;
+
+    :global(.ant-empty) {
+      margin-bottom: 16px;
+    }
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card {
+    display: flex;
+    gap: 18px;
+    padding: 18px;
+    background-color: rgb(248, 247, 242);
+    border: 1px solid rgba(42, 40, 37, 0.12);
+    border-radius: 12px;
+    transition: box-shadow 0.25s ease;
+
+    &:hover {
+      box-shadow: 0 6px 18px rgba(42, 40, 37, 0.08);
+    }
+
+    .cover {
+      flex-shrink: 0;
+      width: 96px;
+      height: 128px;
+      overflow: hidden;
+      border-radius: 8px;
+      background-color: rgb(233, 229, 220);
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .coverPlaceholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        font-size: 22px;
+        color: #b9b5ab;
+      }
+    }
+
+    .info {
+      flex: 1;
+      min-width: 0;
+
+      .name {
+        margin: 0 0 6px;
+        font-size: 16px;
+        font-weight: 700;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        .size {
+          margin-left: 10px;
+          padding: 1px 8px;
+          border: 1px solid rgba(42, 40, 37, 0.3);
+          border-radius: 999px;
+          font-size: 11px;
+          font-style: normal;
+          color: #6b6963;
+          vertical-align: 2px;
+        }
+      }
+
+      .meta {
+        margin: 0 0 4px;
+        font-size: 12px;
+        color: #8a877f;
+      }
+    }
+
+    .side {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      flex-shrink: 0;
+      min-width: 130px;
+
+      .amount {
+        margin: 10px 0 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: rgb(142, 53, 46);
+      }
+
+      .deposit {
+        margin: 0 0 10px;
+        font-size: 11px;
+        color: #a5a29a;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+    }
+  }
+}

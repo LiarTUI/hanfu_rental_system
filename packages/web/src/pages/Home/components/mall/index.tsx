@@ -1,4 +1,4 @@
-import { getMarketProducts } from '@/services/product';
+import { getMarketProducts, type MarketProduct } from '@/services/product';
 import { useNavigate } from '@@/exports';
 import { CalendarOutlined } from '@ant-design/icons';
 import { DatePicker, Select, Spin } from 'antd';
@@ -9,30 +9,8 @@ import styles from './index.less';
 
 const { RangePicker } = DatePicker;
 
-// ========== 商品数据（来自 GET /api/product/market） ==========
-// heat 后端暂未提供时由前端按 rating/reviewCount 折算兜底；
-// available=false → 卡片灰化并显示「当前档期已约满」，选定租赁档期后该卡被滤除
-// featured → 左上角显示红色「镇店良裁」角标
-interface GoodsItem {
-  id: number;
-  name: string;
-  rentPrice: number; // 日租金
-  rentUnit?: number; // 租金单位，1=天
-  dynasty: string; // 宋制 / 晋制 / 唐制 / 明制
-  category: string; // 外搭 / 下装 / 男装 / 步摇...
-  storeId: number;
-  storeName?: string; // 店铺名，接口暂未返回时显示「」占位
-  coverUrl?: string;
-  stock?: number;
-  rating?: number | null;
-  reviewCount?: number;
-  heat: number; // 热度（排序用）
-  available?: boolean; // 选定档期内是否可租（后端档期校验）
-  featured?: boolean;
-}
-
 /** 接口未提供 heat 时，用评分/评价数折算一个兜底热度 */
-const deriveHeat = (g: GoodsItem) =>
+const deriveHeat = (g: MarketProduct) =>
   Math.round((g.rating ?? 0) * 20 + (g.reviewCount ?? 0));
 
 // ========== 断代筛选：match 对应商品数据的 dynasty 字段 ==========
@@ -61,7 +39,7 @@ function Mall({ setActiveKey }: MallProps) {
   const [sortType, setSortType] = useState('heat');
   const [range, setRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [goodsList, setGoodsList] = useState<GoodsItem[]>([]);
+  const [goodsList, setGoodsList] = useState<MarketProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   const hasRange = !!(range?.[0] && range?.[1]);

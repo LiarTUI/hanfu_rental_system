@@ -1,21 +1,12 @@
+import { getScenes, type SceneItem } from '@/services/tag';
 import { CalendarOutlined } from '@ant-design/icons';
 import { DatePicker, message } from 'antd';
 import type { Dayjs } from 'dayjs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IconFont, useAuth } from 'shared';
 import styles from './index.less';
 
 const { RangePicker } = DatePicker;
-
-// ========== 步骤 1：场景选项 ==========
-// TODO: 前两张卡需要配图，后续把 img 填上（本地 import 或接口 URL），为空时显示深色渐变占位
-// TODO: 后两张卡的 icon 名替换成你 iconfont 项目里的真实图标名
-const sceneList = [
-  { id: 'gufeng', name: '古风写真', img: '', icon: '' },
-  { id: 'hunyan', name: '传统婚宴', img: '', icon: '' },
-  { id: 'youyuan', name: '节庆游园', img: '', icon: 'icon-jieri' },
-  { id: 'yaji', name: '雅集日常', img: '', icon: 'icon-huacao' },
-];
 
 // ========== 步骤 2：气韵选项（watermark 是卡片右侧的大水印字）==========
 const styleList = [
@@ -60,13 +51,19 @@ interface SmartMatchProps {
 function SmartMatch({ setActiveKey }: SmartMatchProps) {
   // step: 1 场景 → 2 气韵 → 3 档期 → 4 推演中 → 5 推演完成
   const [step, setStep] = useState(1);
-  const [scene, setScene] = useState('');
+  const [scene, setScene] = useState<number | ''>('');
   const [style, setStyle] = useState('');
   const [range, setRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  // 场景选项来自 GET /api/tag/scenes
+  const [sceneList, setSceneList] = useState<SceneItem[]>([]);
+
+  useEffect(() => {
+    getScenes().then((res) => setSceneList(res?.data ?? []));
+  }, []);
 
   const { isLogin, openLogin } = useAuth();
-  const pickScene = (id: string) => {
+  const pickScene = (id: number) => {
     if (!isLogin) {
       openLogin();
     } else {
@@ -141,26 +138,20 @@ function SmartMatch({ setActiveKey }: SmartMatchProps) {
                   onClick={() => pickScene(item.id)}
                 >
                   {/* 有配图的卡：背景图 + 压暗渐变 + 左下角白字 */}
-                  {item.img ? (
+                  {item.imageUrl ? (
                     <>
                       <img
                         className={styles.sceneImg}
-                        src={item.img}
+                        src={item.imageUrl}
                         alt={item.name}
                       />
                       <div className={styles.sceneMask} />
                       <span className={styles.sceneNameLight}>{item.name}</span>
                     </>
                   ) : (
-                    // 无配图的卡：居中圆形图标 + 文字
+                    // 无配图的卡：居中圆形图标 + 文字（接口暂无 icon 字段，仅显示名称）
                     <div className={styles.sceneCenter}>
-                      <div className={styles.sceneIconCircle}>
-                        <IconFont
-                          type={item.icon}
-                          size={22}
-                          color="rgb(42, 40, 37)"
-                        />
-                      </div>
+                      <div className={styles.sceneIconCircle} />
                       <span className={styles.sceneNameDark}>{item.name}</span>
                     </div>
                   )}

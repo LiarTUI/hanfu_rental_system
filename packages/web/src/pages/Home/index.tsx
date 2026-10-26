@@ -1,5 +1,5 @@
 import { useNavigate } from '@@/exports';
-import { UserOutlined } from '@ant-design/icons';
+import { ProfileOutlined, UserOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
 import { Avatar, ConfigProvider, Layout, Tabs } from 'antd';
 import { useState } from 'react';
@@ -34,6 +34,17 @@ function Index() {
   ) => {
     e?.stopPropagation();
     navigate(`/${key}`, { replace: true });
+  };
+  // 我的订单入口：游客先弹登录 Modal，登录成功后进入订单页
+  const handleOrdersClick = (
+    e?: React.MouseEvent<HTMLElement | SVGSVGElement>,
+  ) => {
+    e?.stopPropagation();
+    if (!isLogin) {
+      openLogin({ after: () => navigate('/orders') });
+      return;
+    }
+    navigate('/orders', { replace: true });
   };
   // 头像/个人中心入口：游客先弹登录 Modal，登录成功后继续跳个人中心
   const handleUserClick = (
@@ -85,6 +96,10 @@ function Index() {
             type="icon-gouwuche"
             size={26}
           ></IconFont>
+          <ProfileOutlined
+            onClick={handleOrdersClick}
+            className={styles.ordersIcon}
+          />
           <Avatar
             onClick={handleUserClick}
             className={styles.avatar}

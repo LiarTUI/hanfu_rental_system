@@ -23,6 +23,10 @@ export default defineConfig({
       component: '@/pages/PersonalCenter',
     },
     {
+      path: '/orders',
+      component: '@/pages/MyOrders',
+    },
+    {
       path: '/buy/:id',
       component: '@/pages/Buy',
     },

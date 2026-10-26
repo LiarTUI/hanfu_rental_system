@@ -19,16 +19,9 @@ export type OrderData = {
   trackingNoReturn: string | null; // 退回物流单号（归还阶段才有）
 };
 
-/** 订单状态 → 展示文案/颜色 */
-export const ORDER_STATUS: Record<number, { text: string; color: string }> = {
-  0: { text: '待支付', color: 'default' },
-  1: { text: '待发货', color: 'orange' },
-  2: { text: '租赁中', color: 'blue' },
-  3: { text: '待归还', color: 'purple' },
-  4: { text: '结算定损中', color: 'gold' },
-  5: { text: '已完成', color: 'green' },
-  6: { text: '已退款关闭', color: 'red' },
-};
+// 订单状态映射统一取自 shared（与 web 端共用，避免双份漂移）
+export { ORDER_STATUS } from 'shared';
+export type { OrderStatusInfo } from 'shared';
 
 // 用户评价（订单详情弹窗内嵌展示；字段待后端确认，暂按通用评价结构）
 export type ReviewData = {
