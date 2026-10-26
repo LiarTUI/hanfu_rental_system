@@ -349,11 +349,87 @@
       }
     }
 
-    .rangePicker {
-      width: 100%;
+    // 租赁档期：起租日期 + 天数计数器 + 归还日
+    .rentRow {
+      display: flex;
+      align-items: flex-end;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
 
-      :global(.ant-picker-selector) {
+    .rentField {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      :global(.ant-picker) {
         font-family: 'Noto Serif SC';
+      }
+    }
+
+    .rentLabel {
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: #8a877f;
+    }
+
+    .counter {
+      display: flex;
+      align-items: center;
+    }
+
+    .counterBtn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(42, 40, 37, 0.25);
+      background: transparent;
+      font-size: 16px;
+      line-height: 1;
+      color: rgb(42, 40, 37);
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:first-child {
+        border-radius: 6px 0 0 6px;
+      }
+
+      &:last-child {
+        border-radius: 0 6px 6px 0;
+        border-left: none;
+      }
+
+      &:hover:not(:disabled) {
+        border-color: rgb(142, 53, 46);
+        color: rgb(142, 53, 46);
+      }
+
+      &:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+    }
+
+    .counterVal {
+      min-width: 52px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-top: 1px solid rgba(42, 40, 37, 0.25);
+      border-bottom: 1px solid rgba(42, 40, 37, 0.25);
+      font-family: 'Noto Serif SC';
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .rentReturn {
+      padding-bottom: 4px;
+      font-size: 13px;
+      color: rgb(142, 53, 46);
+
+      &::before {
+        content: '⟶ ';
+        color: #b9b5ab;
       }
     }
 

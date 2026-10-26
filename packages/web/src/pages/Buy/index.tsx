@@ -3,12 +3,13 @@ import { getProductById } from '@/services/product';
 import { LeftOutlined, ShopOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from '@umijs/max';
 import { Button, DatePicker, message } from 'antd';
-import type { Dayjs } from 'dayjs';
-import { useEffect, useMemo, useState } from 'react';
+import dayjs, { type Dayjs } from 'dayjs';
+import { useEffect, useState } from 'react';
 import { useAuth } from 'shared';
 import styles from './index.less';
 
-const { RangePicker } = DatePicker;
+// 无上限时的技术兜底（maxRentPeriod=null 表示不设上限，仅防御异常值）
+const HARD_MAX_RENT = 365;
 
 // 后端 /api/product/{id} 返回实体（游客白名单，详情免登录可浏览）
 interface ProductSku {
@@ -23,10 +24,12 @@ interface ProductData {
   category: string; // 套装 / 外搭 / 下装...
   dynasty: string; // 宋制 / 唐制...
   coverUrl: string; // /api/upload/... 相对路径
-  rentPrice: number; // 日租金（rentUnit=1 按天，当前全部商品按天计）
+  rentPrice: number; // 单位租金（rentUnit=1 按天 / 2 按周）
+  rentUnit?: number; // 租金单位：1=天（默认）/ 2=周
   deposit: number; // 押金
   cleaningFee?: number; // 洗涤费：按件收取，下单时计入订单总额（10-19 复审口径）
-  minRentPeriod?: number; // 最小起租天数，下单强制校验
+  minRentPeriod?: number; // 最小可租时长（单位随 rentUnit）
+  maxRentPeriod?: number | null; // 最大可租时长（单位随 rentUnit）；null = 不设上限
   status: number; // 1 上架 / 0 下架
   storeId?: number;
   storeName?: string; // 出品商家
@@ -50,7 +53,9 @@ export default function Buy() {
   const [product, setProduct] = useState<ProductData | null>(null);
   const [loaded, setLoaded] = useState(false); // 详情请求是否完成
   const [imgOk, setImgOk] = useState(true); // 封面加载失败时降级为占位块
-  const [range, setRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
+  // 档期 = 起租日期（明天起）+ 租赁天数计数器（上下限随商品 min/maxRentPeriod）
+  const [startDate, setStartDate] = useState<Dayjs>(dayjs().add(1, 'day'));
+  const [days, setDays] = useState(1);
   // 选中的具体衣件（SKU）；默认自动选中成色最好的一件
   const [skuId, setSkuId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false); // 下单请求防重复点击
@@ -71,34 +76,39 @@ export default function Buy() {
             ).skuId,
           );
         }
+        // 默认租赁天数取最小可租天数
+        setDays(Math.max(1, res.data.minRentPeriod ?? 1));
       }
       setLoaded(true);
     });
   }, [id]);
 
-  // 租期按自然日计：起租当日计入，归还当日不计
-  const days = useMemo(() => {
-    if (!range?.[0] || !range?.[1]) return 0;
-    return range[1].diff(range[0], 'day');
-  }, [range]);
+  const minDays = Math.max(1, product?.minRentPeriod ?? 1);
+  // maxRentPeriod = null → 不设上限（仅留技术兜底）；有值则取其与下限的较大者
+  const maxDays =
+    product?.maxRentPeriod != null
+      ? Math.max(minDays, product.maxRentPeriod)
+      : HARD_MAX_RENT;
+  const hasMax = product?.maxRentPeriod != null;
+  // 单位随 rentUnit：1=天（默认）/ 2=周；rentPrice 与 min/maxRentPeriod 数值单位一致
+  const unitLabel = product?.rentUnit === 2 ? '周' : '天';
+  const unitDays = product?.rentUnit === 2 ? 7 : 1;
+
+  // 计数器加减：始终夹在 [minDays, maxDays] 区间内
+  const changeDays = (delta: number) =>
+    setDays((d) => Math.min(maxDays, Math.max(minDays, d + delta)));
+
+  // 租期按自然日计：起租当日计入，归还当日不计（租 N 个单位 = 归还日为起租日 + N×单位天数）
+  const returnDate = startDate.add(days * unitDays, 'day');
 
   const rentTotal = days * (product?.rentPrice ?? 0);
   const cleaningFee = product?.cleaningFee ?? 0; // 洗涤费按件（单件订单 ×1）
   const orderTotal = rentTotal + cleaningFee; // 应付 = 租金 + 洗涤费（押金另计、可退）
-  const minDays = product?.minRentPeriod ?? 1;
   const off = !!product && product.status !== 1;
   const skuList = (product?.skus ?? []).filter((s) => s.conditionStatus !== 4);
 
   // 下单：金额由后端计算，前端只传 SKU + 档期（productId 由 skuId 反查）
   const handleSubmit = async () => {
-    if (days < 1) {
-      message.warning('归还日期需晚于起租日期');
-      return;
-    }
-    if (days < minDays) {
-      message.warning(`该衣衫起租 ${minDays} 天起`);
-      return;
-    }
     if (!skuId) {
       message.warning('请先挑选尺码');
       return;
@@ -107,8 +117,8 @@ export default function Buy() {
     try {
       const res = await createOrder({
         skuId,
-        startDate: range![0]!.format('YYYY-MM-DD'),
-        endDate: range![1]!.format('YYYY-MM-DD'),
+        startDate: startDate.format('YYYY-MM-DD'),
+        endDate: returnDate.format('YYYY-MM-DD'),
       });
       if (res?.success) {
         message.success('下单成功，可在我的订单中支付');
@@ -185,9 +195,11 @@ export default function Buy() {
                   <p className={styles.priceValue}>
                     <span>¥</span>
                     {product.rentPrice}
-                    <i>/日</i>
+                    <i>/{unitLabel}</i>
                   </p>
-                  <span className={styles.priceTag}>日租金</span>
+                  <span className={styles.priceTag}>
+                    {unitLabel === '周' ? '周租金' : '日租金'}
+                  </span>
                 </div>
                 <div className={styles.priceSub}>
                   <p className={styles.priceValue}>
@@ -238,38 +250,77 @@ export default function Buy() {
               </div>
 
               <div className={styles.section}>
-                <p className={styles.sectionTitle}>租赁档期</p>
-                <RangePicker
-                  className={styles.rangePicker}
-                  value={range}
-                  onChange={setRange}
-                />
+                <p className={styles.sectionTitle}>
+                  租赁档期
+                  <span className={styles.sectionTip}>
+                    {hasMax
+                      ? `可租 ${minDays} ~ ${maxDays} ${unitLabel}`
+                      : `可租 ${minDays} ${unitLabel}起，不设上限`}
+                  </span>
+                </p>
+                <div className={styles.rentRow}>
+                  <div className={styles.rentField}>
+                    <span className={styles.rentLabel}>起租日期</span>
+                    <DatePicker
+                      value={startDate}
+                      allowClear={false}
+                      disabledDate={(d) => d.isBefore(dayjs(), 'day')}
+                      onChange={(v) => v && setStartDate(v)}
+                    />
+                  </div>
+                  <div className={styles.rentField}>
+                    <span className={styles.rentLabel}>
+                      租赁时长（{unitLabel}）
+                    </span>
+                    <div className={styles.counter}>
+                      <button
+                        type="button"
+                        className={styles.counterBtn}
+                        disabled={days <= minDays}
+                        onClick={() => changeDays(-1)}
+                      >
+                        −
+                      </button>
+                      <span className={styles.counterVal}>{days}</span>
+                      <button
+                        type="button"
+                        className={styles.counterBtn}
+                        disabled={days >= maxDays}
+                        onClick={() => changeDays(1)}
+                      >
+                        ＋
+                      </button>
+                    </div>
+                  </div>
+                  <span className={styles.rentReturn}>
+                    归还 {returnDate.format('M月D日')}
+                  </span>
+                </div>
               </div>
 
-              {days > 0 && (
-                <div className={styles.bill}>
-                  <div className={styles.billRow}>
-                    <span>
-                      租金小计（{days} 日 × ¥{product.rentPrice}/日）
-                    </span>
-                    <span>¥{rentTotal}</span>
-                  </div>
-                  {!!cleaningFee && (
-                    <div className={styles.billRow}>
-                      <span>洗涤费（归还后由平台统一洗护）</span>
-                      <span>¥{cleaningFee}</span>
-                    </div>
-                  )}
-                  <div className={styles.billRow}>
-                    <span>押金（无损全退，验衣后原路退回）</span>
-                    <span>¥{product.deposit}</span>
-                  </div>
-                  <div className={`${styles.billRow} ${styles.billTotal}`}>
-                    <span>预计应付（下单时）</span>
-                    <span>¥{orderTotal + product.deposit}</span>
-                  </div>
+              <div className={styles.bill}>
+                <div className={styles.billRow}>
+                  <span>
+                    租金小计（{days} {unitLabel} × ¥{product.rentPrice}/
+                    {unitLabel}）
+                  </span>
+                  <span>¥{rentTotal}</span>
                 </div>
-              )}
+                {!!cleaningFee && (
+                  <div className={styles.billRow}>
+                    <span>洗涤费（归还后由平台统一洗护）</span>
+                    <span>¥{cleaningFee}</span>
+                  </div>
+                )}
+                <div className={styles.billRow}>
+                  <span>押金（无损全退，验衣后原路退回）</span>
+                  <span>¥{product.deposit}</span>
+                </div>
+                <div className={`${styles.billRow} ${styles.billTotal}`}>
+                  <span>预计应付（下单时）</span>
+                  <span>¥{orderTotal + product.deposit}</span>
+                </div>
+              </div>
 
               <Button
                 className={styles.submitBtn}
